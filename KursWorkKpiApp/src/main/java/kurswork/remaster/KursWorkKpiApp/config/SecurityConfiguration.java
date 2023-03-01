@@ -24,6 +24,7 @@ import kurswork.remaster.KursWorkKpiApp.services.EmployeeService;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+	
 
 	@Autowired
 	private EmployeeService employeeService;
