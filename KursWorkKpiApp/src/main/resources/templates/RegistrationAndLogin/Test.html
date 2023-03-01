@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "http://thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+<h1 th:text="${'ur name is '+userName + ' and your roles are :'}"></h1>
+<div th:each ="role : ${roles}">
+	<h1  th:text="${role}"></h1>
+</div>
+
+
+<a th:href="@{/EmployeeLogin?logout}">Logout</a>
+<a th:href="@{/UserPage}">UserPage</a>
+<a th:href="@{/AdminPage}">AdminPage</a>
+<a th:href="@{/ManagerPage}">HSecualPage</a>
+<iframe src="https://edumoldova.maps.arcgis.com/apps/instant/basic/index.html?appid=92fc5fff54fd458ab231fec57b66aaae" width="400" height="600" frameborder="0" style="border:0" allowfullscreen>iFrames are not supported on this page.</iframe>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "http://thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1" name="viewport" content="width=device-width, initial-scale=1" />
+<title>Variable Registration</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous"/>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+<style type="text/css">
+.myTableClass{
+	position:relative;
+	top:100px;
+}
+
+
+</style>
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" th:href="@{/}">Formula Registration</a>
+			</div>
+		</div>
+	</nav>
+	
+		<div class="container myTableClass">
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<h1 class= "heading">Add Variable</h1>
+			<div class="form-group">
+				
+				<form th:action="@{/VariableRegistration}" th:method="post" th:object="${variableDTO}" >
+					<div class="form-group">
+						<label class="control-label" for="firstName"> Variable Sign </label>
+						<input id="firstName" class="form-control" th:field="*{variable_sign}"
+							required autofocus="autofocus" />
+					</div>
+					<div class = "form-group">
+						<label for ="formula"> Variable Descr </label> :
+						
+						<textarea id ="formula" name = "formula" class="form-control" th:field="*{variable_descr}"
+							required autofocus="autofocus" ></textarea>
+					</div>
+					<div class = "form-group">
+						<label for ="formula1"> Formula for restrictions </label> :
+						
+						<textarea id ="formula1" name = "formula1" class="form-control" th:field="*{restrictions}"
+							required autofocus="autofocus" ></textarea>
+					</div>
+					
+					<div class="form-group">
+						<label class="control-label" for="count"> Variable count (1 or variable sign) </label>
+						<input id="count" class="form-control" th:field="*{count}"
+							required autofocus="autofocus" />
+					</div>
+					
+					<div class="form-group">
+						<a class="btn btn-success" th:href="@{/CloseVariableForm}">Close</a>
+						<button type="submit" class="btn btn-success">Add Variable</button>
+						
+					</div>
+				</form>	
+			</div>
+					
+				</div>
+			</div>
+		</div>
+	
+
+
+			
+</body>
+</html>

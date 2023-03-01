@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "http://thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1" name="viewport" content="width=device-width, initial-scale=1" />
+<title>Registration</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous"/>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
+<script>
+const passwordChecker = (selector1, selector2) => {
+	var field = document.getElementById(selector2);
+	var field2 = document.getElementById(selector1);
+	
+	field.addEventListener('input', function(event) {
+	    fieldValidator(event, (field.value == field2.value));
+	});
+	
+	function fieldValidator(event, condition) {
+	    var val = event.target.value;
+	    if (!condition) {
+	        event.target.setCustomValidity('Passwords are not equal');
+	    } else {
+	        event.target.setCustomValidity('');
+	    }
+	
+	}
+};
+</script>
+	
+</head>
+<body>
+
+	<!-- create navigation bar ( header) -->
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" th:href="@{/}">Registration</a>
+			</div>
+		</div>
+	</nav>
+
+<br>
+<br>
+	<!-- Create HTML registration form -->
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6 col-md-offset-3">
+
+				<!-- success message -->
+				
+
+				<h1>Registration</h1>
+
+				<form th:action="@{/EmployeeRegistration}" th:method="post" th:object="${employee}" enctype="multipart/form-data">
+					<div class="form-group">
+						<label class="control-label" for="firstName"> Name </label>
+						<input id="firstName" class="form-control" th:field="*{name}"
+							required autofocus="autofocus" />
+					</div>
+
+					<div class="form-group">
+						<label class="control-label" for="lastName"> Surname </label> <input
+							id="lastName" class="form-control" th:field="*{surname}"
+							required autofocus="autofocus" />
+					</div>
+
+					
+					<div class="form-group">
+						<label class="control-label" for="login"> Login <sub th:if = "${emplLoginIncorrect}" style = "color: red">This login has already existed</sub></label> <input
+							id="login" class="form-control" th:field="*{login}" required
+							autofocus="autofocus" pattern = "^[a-zA-Z](.[a-zA-Z0-9_'-]*)$"/>
+					</div>
+					<div class="form-group">
+						<label class="control-label" for="password"> Password</label> <input
+							id="password" name = "passw1" class="form-control" type="password" placeholder="length 6 and more, required A-Z,a-z,0-9"
+							th:field="*{password}" required autofocus="autofocus" pattern ="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,}"/>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label" for="password2"> Password <sub>(confirm)</sub></label> <input
+							id="password2" name = "passw2" class="form-control" type="password" placeholder="reapeat previous password"
+							required autofocus="autofocus" pattern ="(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,}"/>
+						
+					</div>
+					
+					<div class="form-group">
+						<label class="control-label" for="employeeList"> Position</label> <br>
+						<select id="employeeList" th:field = "*{position.position_id}">
+					
+						    <option th:each = "positionfromList : ${positionList}" th:value="${positionfromList.getPosition_id()}" th:text="${positionfromList.getName()}"></option>
+					
+					
+					    
+						</select>
+					
+					</div>
+					
+					<script>
+					        passwordChecker("password", "password2");
+					    </script>
+					 
+				
+					<div class="form-group">
+						
+						<a class="btn btn-success" th:href = "@{/DepartmentSelection}"> Back to Dept Selection</a>
+						<button type="submit" class="btn btn-success">Register</button>
+						<span>Already registered? <a href="/" th:href="@{/EmployeeLogin}">Login
+								here</a></span>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

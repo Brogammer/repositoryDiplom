@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "http://thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1" name="viewport" content="width=device-width, initial-scale=1" />
+<title>Company Registration</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous"/>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+
+<style type="text/css">
+.myTableClass{
+	
+}
+.heading {
+	
+}
+.buttons{
+	
+}
+.container{
+	top: 200px;
+}
+</style>
+</head>
+<body style = "display: flex;flex-direction: column;">
+
+
+
+
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" th:href="@{/}"> Varaibles list for insertion</a>
+			</div>
+		</div>
+	</nav>
+	
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3" style = "display: flex;flex-direction: column;top: 100px;">
+					<h1 class= "heading"  th:text= "${'variables insertion for criteria ' + criteria.getCriteria_name()}"></h1>
+					
+					<div style="max-height: 400px">
+						<h6 th:text="${criteria.getCriteria_descr()}"></h6>
+					
+					</div>
+					
+					<table class="table table-hover myTableClass">
+					  <thead>
+					    <tr>
+					      <th scope="col">N</th>
+					      <th scope="col">variable Sign</th>
+					      <th scope="col">Enter value</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					    <tr th:each = "insertVariable : ${insertVariableDTOList}" th:if="${insertVariable.getVariable().getCount().contains(VariableListType)}">
+					     	<th scope="row" th:text = "${insertVariableDTOList.indexOf(insertVariable)}"></th>
+					     	<td th:text = "${insertVariable.getVariable().getVariable_sign()}"></td>
+					     	<td>
+					     		<div class="form-group">
+									<a class="btn btn-success" th:if="${insertVariable.getInserted_value() == null}" 
+									th:href="@{/{enterURL}/{crID}/{id}(enterURL = ${EnterURL},crID = ${criteria.getCriteria_id()}, id = ${insertVariableDTOList.indexOf(insertVariable)})}"
+									>Enter</a>
+									<a class="btn btn-success" th:if="${insertVariable.getInserted_value() != null}" 
+									th:href="@{/{enterURL}/{crID}/{id}(enterURL = ${EnterURL},crID = ${criteria.getCriteria_id()}, id = ${insertVariableDTOList.indexOf(insertVariable)})}"
+									style="background-color: gray;">Enter</a>
+								
+								</div>
+							</td>
+					     	
+					    </tr>
+					    
+					  </tbody>
+					</table>
+					<br>
+					<br>
+					<br>
+					<br>
+					<div class="buttons">
+						<form th:action="@{${PathUrl +'/'+criteria.getCriteria_id()}}" th:method="post">
+							<small>all variables must be inserted</small>
+							<br>
+							<a class="btn btn-success" th:href = "@{${backUrl}}">Back</a>
+							<a class="btn btn-success" th:href = "@{/DeleteCriteriaValues/{id}(id = ${criteria.getCriteria_id()})}">Delete values</a>
+							<button type="submit" class="btn btn-success" th:text = ${submitButtonName}>Register Domact</button>
+							
+						</form>
+							
+					</div>
+				</div>
+		</div>
+		
+	</div>
+	
+					
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "http://thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1" name="viewport" content="width=device-width, initial-scale=1" />
+<title>Calificat Registration</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous"/>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+
+<style type="text/css">
+.myTableClass{
+	position:relative;
+	top:150px;
+}
+.heading {
+	position:relative;
+	top:100px;
+}
+.buttons{
+	position:relative;
+	top:100px;
+}
+</style>
+</head>
+<body>
+
+
+
+
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" th:href="@{/}">Calification Registration</a>
+			</div>
+		</div>
+	</nav>
+	
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<h1 class= "heading" th:text = "${'Calification registration for ' + position.getName() + '(DomAct '+domact.getDomact_name()+')'}">Calification Registration</h1>
+					
+					<table class="table table-hover myTableClass">
+					  <thead>
+					    <tr>
+					      <th scope="col">N</th>
+					      <th scope="col">calification range</th>
+					      <th scope="col">calification name(symbol)</th>
+					      <th scope="col">Update</th>
+					      <th scope="col">Delete</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					    <tr th:each = "calificatDTO : ${calificatDTOList}">
+					     	<th scope="row" th:text = "${calificatDTOList.indexOf(calificatDTO)}"></th>
+					     	<td th:text = "${calificatDTO.getLeft_bound() + '<=_<' + calificatDTO.getRight_bound()}"></td>
+					     	<td th:text = "${calificatDTO.getCalificat_coef() + ' ('+calificatDTO.getCalificat_symbol()+')'}"></td>
+					     	<td>
+					     		<div class="form-group">
+									<a class="btn btn-success" th:href="@{/CalificationUpdation/{id}(id = ${calificatDTOList.indexOf(calificatDTO)})}">Update</a>
+								</div>
+							</td>
+					     	<td>
+					     		<div class="form-group">
+					     			<form th:action="@{/DeleteCalificatFromList/{id}(id = ${calificatDTOList.indexOf(calificatDTO)})}" th:method="post">
+					     				<button type="submit" class="btn btn-success">Delete</button>
+					     			</form>
+									
+								</div>
+					     	</td>
+					    </tr>
+					  </tbody>
+					</table>
+					<br>
+					<br>
+					<br>
+					<br>
+					<div class="buttons">
+						<a class="btn btn-success" th:href = "@{/CalificationRegistration}">Add Calification</a>
+						<form th:action="@{/CalifListReg}" th:method="post">
+							<small>calification must have at least one range</small>
+							<br>
+							<button type="submit" class="btn btn-success">Register calification</button>
+						</form>
+							
+					</div>
+				</div>
+		</div>
+		
+	</div>
+	
+					
+</body>
+</html>

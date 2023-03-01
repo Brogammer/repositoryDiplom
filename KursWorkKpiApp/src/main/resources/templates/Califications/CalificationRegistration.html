@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "http://thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1" name="viewport" content="width=device-width, initial-scale=1" />
+<title>Company Registration</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous"/>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+<style type="text/css">
+.myTableClass{
+	position:relative;
+	top:100px;
+	
+
+}
+.wrongBoundsMessage{
+	color : red;
+}
+
+</style>
+
+
+
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" th:href="@{/}">Coef Premium Registration</a>
+			</div>
+		</div>
+	</nav>
+	
+		<div class="container myTableClass">
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<h1 class= "heading">Add Coef Row</h1>
+					<div class="form-group">
+						
+						<form th:action="@{/CalificationRegistration}" th:method="post" th:object="${calificationDTO}" id="formInp">
+							<div class="form-group">
+								<label class="control-label" for="leftBound"> Left Bound </label>
+								<input id="leftBound" class="form-control" th:field="*{left_bound}"
+									required autofocus="autofocus" type = "number" step="any"/>
+							</div>
+							
+							<div class="form-group">
+								<label class="control-label" for="rightBound"> Right Bound </label>
+								<input id="rightBound" class="form-control" th:field="*{right_bound}"
+									required autofocus="autofocus" type = "number" step="any"/>
+							</div>
+							
+							<div class="form-group">
+								<label class="control-label" for="coef"> Calificat Coefficient </label>
+								<input id="coef" class="form-control" th:field="*{calificat_coef}"
+									required autofocus="autofocus" type = "number" step="any"/>
+							</div>
+							
+								<div class="form-group">
+								<label class="control-label" for="coefsymbol"> Calificat Symbol </label>
+								<input id="coefsymbol" class="form-control" th:field="*{calificat_symbol}"
+									required autofocus="autofocus" type = "text" step="any"/>
+							</div>
+							
+							
+							
+							<div class="form-group">
+								<a class="btn btn-success" th:href="@{/CloseCoefAddition}">Close</a>
+								<button type="submit" class="btn btn-success" id="subminButton">Add Coef Row</button>
+								<p th:if=${wrongBounds} class = "wrongBoundsMessage">WRONG BOUNDS! Left bound should be smaller than right</p>
+								<p th:if=${BoundError} class = "wrongBoundsMessage">WRONG BOUNDS! Bounds should not be inside other bounds</p>
+							</div>
+						</form>	
+					</div>
+				 	
+				</div>
+			</div>
+		</div>
+	
+
+		
+			
+</body>
+
+
+</html>
