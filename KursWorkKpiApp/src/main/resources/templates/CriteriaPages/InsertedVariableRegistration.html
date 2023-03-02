@@ -44,6 +44,7 @@
 				<h3 th:text = "${'Name: ' + insertedVariableDTO.getVariable().getVariable_sign()}"></h3>
 				<h3 th:text = "${'Descr: '+insertedVariableDTO.getVariable().getVariable_descr()}"></h3>
 				<h3 th:text = "${'Restrictions: ' +insertedVariableDTO.getVariable().getRestrictions()}" th:if = "${!insertedVariableDTO.getVariable().getRestrictions().equals('null')}"></h3>
+				<h3 th:if = "${!errorRestrictions.isBlank() && !errorRestrictions.isEmpty()}" th:text = "${errorRestrictions}" style="color:red;"></h3>
 				<form th:action="@{${postURL}}" th:method="post" th:object="${insertedVariableDTO}" >
 					<div class="form-group">
 						<label class="control-label" for="firstName"> Variable Value </label>

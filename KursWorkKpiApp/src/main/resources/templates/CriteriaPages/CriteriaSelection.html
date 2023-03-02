@@ -111,9 +111,17 @@ img{
 											     <tr>
 											      <td>
 											      	
-											     	<div class="form-group">
-														<a th:href = "@{${SelectedUrlPath +'/'+ criteria.getCriteria_id()}}" class="btn btn-success">Insert</a>
+											      	<div class="form-group" th:each = "insVar : ${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id())}">
+														<p th:text = "${insVar.getVariable().getVariable_sign() + ' = '  + insVar.getInserted_value()}"></p>
+													
 													</div>
+											      	
+											     	<div class="form-group">
+														<a th:if= "${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id()) == null}" th:href = "@{${SelectedUrlPath +'/'+ criteria.getCriteria_id()}}" class="btn btn-success">Insert</a>
+														<a th:if="${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id()) != null}" style='background-color: gray;' th:href = "@{/DeleteCriteriaValues/forInsert/{id}(id = ${criteria.getCriteria_id()})}" class="btn btn-success">Insert again</a>
+													
+													</div>
+													
 											      </td>
 											      
 											    </tr>

@@ -92,8 +92,8 @@
 							<small>all variables must be inserted</small>
 							<br>
 							<a class="btn btn-success" th:href = "@{${backUrl}}">Back</a>
-							<a class="btn btn-success" th:href = "@{/DeleteCriteriaValues/{id}(id = ${criteria.getCriteria_id()})}">Delete values</a>
-							<button type="submit" class="btn btn-success" th:text = ${submitButtonName}>Register Domact</button>
+							<a class="btn btn-success" th:href = "@{/DeleteCriteriaValues/forDelete/{id}(id = ${criteria.getCriteria_id()})}">Delete values</a>
+							<button type="submit" class="btn btn-success" th:text = ${submitButtonName}>Register</button>
 							
 						</form>
 							

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kurswork.remaster.KursWorkKpiApp.dto.FormulaDTO;
+import kurswork.remaster.KursWorkKpiApp.dto.InsertedVariableDTO;
 import kurswork.remaster.KursWorkKpiApp.model.Employee;
 import kurswork.remaster.KursWorkKpiApp.model.Formula;
 import kurswork.remaster.KursWorkKpiApp.model.InsertedVariable;
@@ -135,6 +136,37 @@ public class FormulaServiceImpl implements FormulaService {
 		Formula formula = new Formula(0, formulaDTO.getFormula_string(), null, null);
 		return formulaRepository.save(formula);
 	}
+
+	@Override
+	public boolean checkRestrictions(InsertedVariableDTO dto, String insertedValue) {
+		
+		String restrictions = dto.getVariable().getRestrictions();
+		
+		if (restrictions == null || restrictions.isBlank() || restrictions.isEmpty() || restrictions.toLowerCase().equals("null")) {
+			return true;
+		}
+		
+		String varSign = dto.getVariable().getVariable_sign().trim();
+		Double value = 0.0;
+		try {
+			value = Double.parseDouble(insertedValue.replace(',', '.'));
+
+		} catch (Exception e) {
+			return false;
+		}
+		
+		
+		Function function = new Function("f", restrictions, varSign);
+		
+		Expression expression = new Expression("f("+value+")", function);
+		double result = expression.calculate();
+		
+		if (result == 1.0) 
+			return true;
+		else
+			return false;
+	}
+	
 	
 	
 }
