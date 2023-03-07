@@ -111,9 +111,10 @@ img{
 											     <tr>
 											      <td>
 											      	
-											      	<div class="form-group" th:each = "insVar : ${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id())}">
+											      	<div  class="form-group" th:each = "insVar : ${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id())}">
 														<p th:text = "${insVar.getVariable().getVariable_sign() + ' = '  + insVar.getInserted_value()}"></p>
-													
+														<p  th:text = "${'Comment: '+insVar.getComment()}"></p>
+														
 													</div>
 											      	
 											     	<div class="form-group">

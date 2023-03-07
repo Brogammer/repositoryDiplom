@@ -19,7 +19,7 @@ public class InsertedVariableServiceImpl implements InsertedVariableService{
 	@Override
 	public InsertedVariable save(InsertedVariableDTO dto) {
 		InsertedVariable insertedVariable = new InsertedVariable(0, dto.getDatetime(), dto.getInserted_value(), 
-				dto.getEmployee(), dto.getVariable());
+				dto.getEmployee(), dto.getVariable(),dto.getComment());
 		return insertedVariableRepository.save(insertedVariable);
 	}
 

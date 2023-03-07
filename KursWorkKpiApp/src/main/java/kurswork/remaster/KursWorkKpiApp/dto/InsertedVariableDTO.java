@@ -11,6 +11,7 @@ public class InsertedVariableDTO {
 	private String inserted_value;
 	private Employee employee;
 	private Variable variable;
+	private String comment;
 	public Date getDatetime() {
 		return datetime;
 	}
@@ -35,7 +36,15 @@ public class InsertedVariableDTO {
 	public void setVariable(Variable variable) {
 		this.variable = variable;
 	}
-	public InsertedVariableDTO(Date datetime, String inserted_value, Employee employee, Variable variable) {
+	
+	
+	public String getComment() {
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	public InsertedVariableDTO(Date datetime, String inserted_value, Employee employee, Variable variable, String comment) {
 		super();
 		this.datetime = datetime;
 		this.inserted_value = inserted_value;

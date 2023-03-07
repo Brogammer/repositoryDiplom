@@ -28,6 +28,10 @@ public class InsertedVariable {
 	@ManyToOne
 	@JoinColumn(name = "variable_id", nullable = false)
 	private Variable variable;
+	
+	@Column(name = "comment", nullable = true, length = 2000)
+	private String comment;
+	
 	public int getInsVar_id() {
 		return insVar_id;
 	}
@@ -58,13 +62,22 @@ public class InsertedVariable {
 	public void setVariable(Variable variable) {
 		this.variable = variable;
 	}
-	public InsertedVariable(int insVar_id, Date datetime, String inserted_value, Employee employee, Variable variable) {
+	
+	
+	public String getComment() {
+		return comment;
+	}
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	public InsertedVariable(int insVar_id, Date datetime, String inserted_value, Employee employee, Variable variable, String comment) {
 		super();
 		this.insVar_id = insVar_id;
 		this.datetime = datetime;
 		this.inserted_value = inserted_value;
 		this.employee = employee;
 		this.variable = variable;
+		this.comment = comment;
 	}
 	public InsertedVariable() {
 		super();

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import kurswork.remaster.KursWorkKpiApp.dto.EmployeeRegistrationDTO;
 import kurswork.remaster.KursWorkKpiApp.model.CalculatedDomact;
-import kurswork.remaster.KursWorkKpiApp.model.CriteriaComment;
 import kurswork.remaster.KursWorkKpiApp.model.Employee;
 import kurswork.remaster.KursWorkKpiApp.model.InsertedVariable;
 import kurswork.remaster.KursWorkKpiApp.model.UserRole;
@@ -72,11 +71,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 		Set<UserRole> roles = new HashSet<>();
 		Set<InsertedVariable> insertedVariables = new HashSet<>();
 		Set<CalculatedDomact> calculatedDomacts = new HashSet<>();
-		Set<CriteriaComment> comments = new HashSet<>();
 		
 		String encodedPassword = encoder.encode(dto.getPassword());
 		
-		Employee employee = new Employee(0, dto.getName(), dto.getSurname(), dto.getLogin(), encodedPassword, dto.getPosition(), roles, insertedVariables, calculatedDomacts, comments);
+		Employee employee = new Employee(0, dto.getName(), dto.getSurname(), dto.getLogin(), encodedPassword, dto.getPosition(), roles, insertedVariables, calculatedDomacts);
 		
 		Employee savedEmployee = employeeRepository.save(employee);
 		userRoleService.assignEmployeeRole(savedEmployee.getEmployee_id(), 1); // 1 - User role, 2 - Admin role

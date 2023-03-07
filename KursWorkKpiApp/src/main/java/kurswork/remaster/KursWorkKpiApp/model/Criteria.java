@@ -33,9 +33,7 @@ public class Criteria {
 	private Set<CriteriaFormula> criteriaFormulas;
 	
 
-	@OneToMany(mappedBy = "criteria",fetch = FetchType.EAGER)
-	private Set<CriteriaComment> comments;
-
+	
 
 	public int getCriteria_id() {
 		return criteria_id;
@@ -87,25 +85,17 @@ public class Criteria {
 	}
 
 
-	public Set<CriteriaComment> getComments() {
-		return comments;
-	}
-
-
-	public void setComments(Set<CriteriaComment> comments) {
-		this.comments = comments;
-	}
-
+	
 
 	public Criteria(int criteria_id, String criteria_name, String criteria_descr, Subgroup subgroup,
-			Set<CriteriaFormula> criteriaFormulas, Set<CriteriaComment> comments) {
+			Set<CriteriaFormula> criteriaFormulas) {
 		super();
 		this.criteria_id = criteria_id;
 		this.criteria_name = criteria_name;
 		this.criteria_descr = criteria_descr;
 		this.subgroup = subgroup;
 		this.criteriaFormulas = criteriaFormulas;
-		this.comments = comments;
+		
 	}
 
 

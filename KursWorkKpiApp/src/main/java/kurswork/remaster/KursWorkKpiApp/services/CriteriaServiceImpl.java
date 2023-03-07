@@ -16,7 +16,7 @@ public class CriteriaServiceImpl implements CriteriaService{
 	@Override
 	public Criteria save(CriteriaDTO dto) {
 		// TODO Auto-generated method stub
-		Criteria criteria = new Criteria(0, dto.getCriteria_name(), dto.getCriteria_descr(), dto.getSubgroup(), null, null);
+		Criteria criteria = new Criteria(0, dto.getCriteria_name(), dto.getCriteria_descr(), dto.getSubgroup(), null);
 		return criteriaRepository.save(criteria);
 	}
 	@Override

@@ -603,7 +603,7 @@ public class CriteriaController {
 
 			insertedVariableDTOs = selectedCriteria.getCriteriaFormulas().stream()
 					.flatMap(crFormula -> crFormula.getFormula().getFormulaVariables().stream())
-					.map(formVar -> new InsertedVariableDTO(null, null, employee, formVar.getVariable()))
+					.map(formVar -> new InsertedVariableDTO(null, null, employee, formVar.getVariable(),null))
 					.collect(Collectors.toList());
 
 			httpSession.setAttribute("insertedVariablesDTO_" + id, insertedVariableDTOs);
@@ -692,6 +692,7 @@ public class CriteriaController {
 		}
 
 		insertedVariableDTOs.get(id).setInserted_value(insertedVariableDTO.getInserted_value());
+		insertedVariableDTOs.get(id).setComment(insertedVariableDTO.getComment());
 		httpSession.removeAttribute("errorRestrictions");
 
 		return "redirect:/VariablesListOfCriteria/" + crID;
@@ -724,7 +725,7 @@ public class CriteriaController {
 								.getVariable().getVariable_sign().equals(insVar.getVariable().getCount()))
 						.findAny().orElse(null).getInserted_value())).forEach(i -> {
 							multipliedMultVariableDTOs.add(new InsertedVariableDTO(insVar.getDatetime(),
-									insVar.getInserted_value(), insVar.getEmployee(), insVar.getVariable()));
+									insVar.getInserted_value(), insVar.getEmployee(), insVar.getVariable(),insVar.getComment()));
 						});
 			});
 			httpSession.setAttribute("multipliedVariableDTO_" + id, multipliedMultVariableDTOs);
@@ -839,6 +840,7 @@ public class CriteriaController {
 		}
 
 		multipliedMultVariableDTOs.get(id).setInserted_value(insertedVariableDTO.getInserted_value());
+		multipliedMultVariableDTOs.get(id).setComment(insertedVariableDTO.getComment());
 		httpSession.removeAttribute("errorRestrictions");
 		return "redirect:/NextVariablesListOfCriteria/" + crID;
 	}

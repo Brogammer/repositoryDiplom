@@ -51,8 +51,7 @@ public class Employee {
 	@OneToMany(mappedBy = "employee")
 	private Set<CalculatedDomact> calculatedDomacts;
 
-	@OneToMany(mappedBy = "employee")
-	private Set<CriteriaComment> comments;
+	
 
 	public int getEmployee_id() {
 		return employee_id;
@@ -126,17 +125,10 @@ public class Employee {
 		this.calculatedDomacts = calculatedDomacts;
 	}
 
-	public Set<CriteriaComment> getComments() {
-		return comments;
-	}
-
-	public void setComments(Set<CriteriaComment> comments) {
-		this.comments = comments;
-	}
+	
 
 	public Employee(int employee_id, String name, String surname, String login, String password, Position position,
-			Set<UserRole> userRoles, Set<InsertedVariable> insertedVariables, Set<CalculatedDomact> calculatedDomacts,
-			Set<CriteriaComment> comments) {
+			Set<UserRole> userRoles, Set<InsertedVariable> insertedVariables, Set<CalculatedDomact> calculatedDomacts) {
 		super();
 		this.employee_id = employee_id;
 		this.name = name;
@@ -147,7 +139,7 @@ public class Employee {
 		this.userRoles = userRoles;
 		this.insertedVariables = insertedVariables;
 		this.calculatedDomacts = calculatedDomacts;
-		this.comments = comments;
+		
 	}
 
 	public Employee() {
