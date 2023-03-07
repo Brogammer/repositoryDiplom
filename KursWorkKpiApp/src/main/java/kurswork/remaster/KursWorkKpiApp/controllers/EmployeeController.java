@@ -1,6 +1,10 @@
 package kurswork.remaster.KursWorkKpiApp.controllers;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -14,23 +18,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import ch.qos.logback.core.filter.Filter;
 import kurswork.remaster.KursWorkKpiApp.dto.EmployeeRegistrationDTO;
 import kurswork.remaster.KursWorkKpiApp.model.Criteria;
 import kurswork.remaster.KursWorkKpiApp.model.Department;
+import kurswork.remaster.KursWorkKpiApp.model.Domact;
 import kurswork.remaster.KursWorkKpiApp.model.Employee;
 import kurswork.remaster.KursWorkKpiApp.model.Formula;
 import kurswork.remaster.KursWorkKpiApp.model.FormulaVariables;
+import kurswork.remaster.KursWorkKpiApp.model.InsertedVariable;
 import kurswork.remaster.KursWorkKpiApp.model.Position;
+import kurswork.remaster.KursWorkKpiApp.model.Subgroup;
 import kurswork.remaster.KursWorkKpiApp.model.Variable;
 import kurswork.remaster.KursWorkKpiApp.services.CriteriaService;
 import kurswork.remaster.KursWorkKpiApp.services.EmployeeService;
 import kurswork.remaster.KursWorkKpiApp.services.FormulaService;
 import kurswork.remaster.KursWorkKpiApp.services.PositionService;
 
-
 @Controller
 public class EmployeeController {
-	
+
 	@Autowired
 	EmployeeService employeeService;
 	@Autowired
@@ -39,110 +46,151 @@ public class EmployeeController {
 	PositionService positionService;
 	@Autowired
 	CriteriaService criteriaService;
-	
+
 	@GetMapping("/EmployeeLogin")
 	public String getLoginPage() {
-		
+
 		return "/RegistrationAndLogin/LoginForm";
 	}
-	
-	
 
-	
 	@GetMapping("/")
 	public String getRedirect() {
 		return "redirect:/Test";
 	}
-	
+
 	@GetMapping("/EmployeeRegistration")
-	public String getRegistrationMenu (Model model, HttpSession httpSession) {
-		
+	public String getRegistrationMenu(Model model, HttpSession httpSession) {
+
 		Department selectedDepartment = (Department) httpSession.getAttribute("selectedDepartment");
 		if (selectedDepartment == null) {
 			return "redirect:/DepartmentSelection";
 		}
-		
-		
+
 		List<Position> positions = positionService.findAllByDepartmentId(selectedDepartment.getDepartment_id());
-		
-		
+
 		EmployeeRegistrationDTO emptyDTO = new EmployeeRegistrationDTO();
 		emptyDTO.setPosition(new Position());
-		
+
 		model.addAttribute("employee", emptyDTO);
-		
+
 		httpSession.setAttribute("positionList", positions);
 		model.addAttribute("positionList", positions);
-		
+
 		return "RegistrationAndLogin/RegistrationForm";
 	}
-	
+
 	@PostMapping("/EmployeeRegistration")
-	public String postRegistrationData (@ModelAttribute("employee") EmployeeRegistrationDTO dto, Model model, HttpSession httpSession ) {
-		
+	public String postRegistrationData(@ModelAttribute("employee") EmployeeRegistrationDTO dto, Model model,
+			HttpSession httpSession) {
+
 		boolean isLoginIncorrect = employeeService.hasAlreadyLoginExisted(dto.getLogin());
-		
-		
+
 		if (isLoginIncorrect) {
 			model.addAttribute("employee", dto);
-			model.addAttribute("emplLoginIncorrect", isLoginIncorrect);			
+			model.addAttribute("emplLoginIncorrect", isLoginIncorrect);
 			return "RegistrationAndLogin/RegistrationForm";
-		}
-		else {
+		} else {
 			@SuppressWarnings("unchecked")
 			List<Position> positions = (List<Position>) httpSession.getAttribute("positionList");
 			Position chosedPosition = positionService.findById(dto.getPosition().getPosition_id());
 			dto.setPosition(chosedPosition);
-			
+
 			employeeService.save(dto);
 			httpSession.removeAttribute("positionList");
 			httpSession.removeAttribute("selectedDepartment");
-			
+
 			return "redirect:/EmployeeLogin?success";
 		}
-		
-	}	
-	
-	
-	//TESTTESTEST
-	
+
+	}
+
+	// TESTTESTEST
+
 	@GetMapping("/Test")
 	public String getTest(Model model) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
+
 		model.addAttribute("userName", authentication.getName());
 		model.addAttribute("roles", authentication.getAuthorities());
-		
+
 		Criteria criteria = criteriaService.findCriteriaById(13);
 		System.out.println("Critera name:\n\t" + criteria.getCriteria_name());
 		System.out.println("Critera decription:\n\t" + criteria.getCriteria_descr());
-		Formula formula = criteria.getCriteriaFormulas()
-				.stream()
-				.findAny()
-				.orElse(null)
-				.getFormula();
+		Formula formula = criteria.getCriteriaFormulas().stream().findAny().orElse(null).getFormula();
 		Employee employee = employeeService.findByLogin(authentication.getName());
-		double result = formulaService.evaluateFormula(formula, employee);
+
+		Set<InsertedVariable> insVars = employee.getInsertedVariables();
+		Date lastDate = insVars.stream().map(insVar -> insVar.getDatetime())
+				.max((date1, date2) -> date1.compareTo(date2)).orElse(null);
+		double result = formulaService.evaluateFormula(formula, employee, lastDate);
 		System.out.println(result);
+
+		System.out.println("Name:");
+		System.out.println(employee.getLogin());
+
+		System.out.println("Insertion date:" + lastDate.toString());
+		insVars.removeIf(insVar -> insVar.getDatetime().compareTo(lastDate) != 0);
+		List<Criteria> insertedCriterias = insVars.stream()
+				.flatMap(insVar -> insVar.getVariable().getFormulaVariables().stream())
+				.flatMap(formVar -> formVar.getFormula().getCriteriaFormulas().stream())
+				.map(critForm -> critForm.getCriteria()).distinct().collect(Collectors.toList());
+
+		List<Subgroup> insertedSubgroups = insertedCriterias.stream().map(insCriteria -> insCriteria.getSubgroup())
+				.distinct().collect(Collectors.toList());
+
+		List<Domact> insertedDomacts = insertedSubgroups.stream().map(insSubgroup -> insSubgroup.getDomact()).distinct()
+				.collect(Collectors.toList());
+		System.out.println(insertedDomacts.size());
+		insertedDomacts.stream().forEach(insDomact -> {
+			System.out.println(insDomact.getDomact_name() + ":");
+			insDomact.getSubgroups().stream().filter(subgr -> insertedSubgroups.contains(subgr)).forEach(insSubgr -> {
+				System.out.println("\t" + insSubgr.getSubgroup_name() + ":");
+				insSubgr.getCriterias().stream().filter(crit -> insertedCriterias.contains(crit)).forEach(insCrit -> {
+					System.out.println("\t\t" + insCrit.getCriteria_name() + ":");
+					insCrit.getCriteriaFormulas().stream()
+							.flatMap(crForm -> crForm.getFormula().getFormulaVariables().stream())
+							.flatMap(formVar -> formVar.getVariable().getInsertedVariables().stream())
+							.filter(insVar -> insVars.contains(insVar)).forEach(lastInsVars -> {
+								System.out.println("\t\t\t" + lastInsVars.getVariable().getVariable_sign() + " = "
+										+ lastInsVars.getInserted_value());
+							});
+				});
+			});
+		});
 		
-		
+		List<List<Double>> criteriaResults = new ArrayList<>();
+		insertedDomacts.stream().forEach(insDomact -> {
+			criteriaResults.add(new ArrayList<>());
+			insDomact.getSubgroups().stream().filter(subgr -> insertedSubgroups.contains(subgr)).forEach(insSubgr -> {
+				insSubgr.getCriterias().stream().filter(crit -> insertedCriterias.contains(crit)).forEach(insCrit -> {
+					insCrit.getCriteriaFormulas().stream()
+							.map(crForm -> crForm.getFormula()).forEach(form -> {
+								criteriaResults.get(criteriaResults.size() - 1).add(formulaService.evaluateFormula(form, employee, lastDate));
+							});
+					
+				});
+			});
+		});
+		criteriaResults.forEach(res->System.out.println(res.stream().reduce(0.0, (d1,d2)-> d1 + d2)));
+
 		return "/RegistrationAndLogin/Test";
 	}
-	
-	//TESTTESTEST
-	
-	
+
+	// TESTTESTEST
+
 	@GetMapping("/UserPage")
 	public String getTestUserPage() {
 		return "/RegistrationAndLogin/TestUserPage";
 	}
+
 	@GetMapping("/AdminPage")
 	public String getTestAdminPage() {
 		return "/RegistrationAndLogin/TestAdminPage";
 	}
+
 	@GetMapping("/ManagerPage")
 	public String getTestManagerPage() {
 		return "/RegistrationAndLogin/TestManagerPage";
 	}
-	
+
 }

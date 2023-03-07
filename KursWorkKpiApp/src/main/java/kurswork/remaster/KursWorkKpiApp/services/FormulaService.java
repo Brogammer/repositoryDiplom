@@ -1,5 +1,7 @@
 package kurswork.remaster.KursWorkKpiApp.services;
 
+import java.util.Date;
+
 import kurswork.remaster.KursWorkKpiApp.dto.FormulaDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.InsertedVariableDTO;
 import kurswork.remaster.KursWorkKpiApp.model.Employee;
@@ -7,7 +9,7 @@ import kurswork.remaster.KursWorkKpiApp.model.Formula;
 
 public interface FormulaService {
 
-	public double evaluateFormula(Formula formula, Employee employee);
+	public double evaluateFormula(Formula formula, Employee employee, Date datetime);
 	public Formula save(FormulaDTO formulaDTO);
 	public boolean checkRestrictions(InsertedVariableDTO dto, String insertedValue);
 }
