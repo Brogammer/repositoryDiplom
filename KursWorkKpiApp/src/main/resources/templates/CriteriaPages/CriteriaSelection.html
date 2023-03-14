@@ -148,7 +148,13 @@ img{
 			</div>
 		</div>
 	</div>
-	
+	<div class="form-group">
+		<form th:action="@{insertNormaStiintifica}" th:method="post" th:object= "${normaStiintificaDTO}">
+			<label for = "norma">Norma Striintifica</label> <br>
+			<input type="number" step = "any" th:field = "*{value}" id = "norma" required autofocus> <br><br>	
+			<button type="submit" class="btn btn-success">Enter Norma Stiistifica</button>
+		</form>
+	</div>
 	<form th:action="@{submitVariableInserting}" th:method="post">
 		<button type="submit" class="btn btn-success">Submit</button>
 	</form>

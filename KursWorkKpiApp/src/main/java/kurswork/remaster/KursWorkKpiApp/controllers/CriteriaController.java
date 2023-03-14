@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -30,6 +32,7 @@ import kurswork.remaster.KursWorkKpiApp.dto.DomActRegistrationDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.FormulaDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.FormulaVariableDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.InsertedVariableDTO;
+import kurswork.remaster.KursWorkKpiApp.dto.NormaStiintificaDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.SearchSettingsDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.SubgroupRegistrationDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.VariableDTO;
@@ -37,6 +40,7 @@ import kurswork.remaster.KursWorkKpiApp.model.Criteria;
 import kurswork.remaster.KursWorkKpiApp.model.Domact;
 import kurswork.remaster.KursWorkKpiApp.model.Employee;
 import kurswork.remaster.KursWorkKpiApp.model.Formula;
+import kurswork.remaster.KursWorkKpiApp.model.InsertedVariable;
 import kurswork.remaster.KursWorkKpiApp.model.Position;
 import kurswork.remaster.KursWorkKpiApp.model.Subgroup;
 import kurswork.remaster.KursWorkKpiApp.services.CriteriaFormulaService;
@@ -479,6 +483,11 @@ public class CriteriaController {
 			searchSettingsDTO = new SearchSettingsDTO();
 		}
 
+		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
+
+		model.addAttribute("normaStiintificaDTO",
+				normaStiintificaDTO == null ? new NormaStiintificaDTO(0) : normaStiintificaDTO);
+
 		model.addAttribute("searchDTO", searchSettingsDTO);
 
 		return "/CriteriaPages/CriteriaSelection";
@@ -603,7 +612,7 @@ public class CriteriaController {
 
 			insertedVariableDTOs = selectedCriteria.getCriteriaFormulas().stream()
 					.flatMap(crFormula -> crFormula.getFormula().getFormulaVariables().stream())
-					.map(formVar -> new InsertedVariableDTO(null, null, employee, formVar.getVariable(),null))
+					.map(formVar -> new InsertedVariableDTO(null, null, employee, formVar.getVariable(), null))
 					.collect(Collectors.toList());
 
 			httpSession.setAttribute("insertedVariablesDTO_" + id, insertedVariableDTOs);
@@ -724,8 +733,9 @@ public class CriteriaController {
 						.filter(singleInsVar -> singleInsVar.getVariable().getCount().equals("1") && singleInsVar
 								.getVariable().getVariable_sign().equals(insVar.getVariable().getCount()))
 						.findAny().orElse(null).getInserted_value())).forEach(i -> {
-							multipliedMultVariableDTOs.add(new InsertedVariableDTO(insVar.getDatetime(),
-									insVar.getInserted_value(), insVar.getEmployee(), insVar.getVariable(),insVar.getComment()));
+							multipliedMultVariableDTOs
+									.add(new InsertedVariableDTO(insVar.getDatetime(), insVar.getInserted_value(),
+											insVar.getEmployee(), insVar.getVariable(), insVar.getComment()));
 						});
 			});
 			httpSession.setAttribute("multipliedVariableDTO_" + id, multipliedMultVariableDTOs);
@@ -875,22 +885,116 @@ public class CriteriaController {
 	@PostMapping("submitVariableInserting")
 	public String submitVariableInserting(Model model, HttpSession httpSession) {
 		List<Criteria> criterias = criteriaService.findAll();
-
+		java.util.Date lastDate = Date.valueOf(LocalDate.now());
+		List<List<InsertedVariableDTO>> insertedVariableDTOsListOfList = new ArrayList<>();
 		criterias.stream().forEach(criteria -> {
+
 			if (httpSession.getAttribute("insertedVariablesDTO_" + criteria.getCriteria_id()) != null) {
-				
+				insertedVariableDTOsListOfList.add(new ArrayList<>());
 				((List<InsertedVariableDTO>) httpSession
 						.getAttribute("insertedVariablesDTO_" + criteria.getCriteria_id())).forEach(insVar -> {
 							if (insVar.getInserted_value() != null && !insVar.getInserted_value().isBlank()
-									&& !insVar.getInserted_value().isEmpty())
-								insVar.setDatetime(Date.valueOf(LocalDate.now()));
-								insertedVariableService.save(insVar);
+									&& !insVar.getInserted_value().isEmpty()) {
+								insVar.setDatetime(lastDate);
+								insertedVariableDTOsListOfList.get(insertedVariableDTOsListOfList.size() - 1)
+										.add(insVar);
+								System.out.println(
+										insVar.getVariable().getVariable_sign() + ":" + insVar.getInserted_value());
+
+							}
 						});
+//				httpSession.removeAttribute("insertedVariablesDTO_" + criteria.getCriteria_id());
 			}
 
 		});
 
+//		
+
+		List<Formula> calculatedFormulas = insertedVariableDTOsListOfList.stream().flatMap(list -> list.stream())
+				.flatMap(dto -> dto.getVariable().getFormulaVariables().stream()).map(formVar -> formVar.getFormula())
+				.distinct().collect(Collectors.toList());
+
+		Map<Formula, List<List<InsertedVariableDTO>>> mapOfFormulaVars = calculatedFormulas.stream()
+				.collect(Collectors.toMap(formula -> formula, formula -> insertedVariableDTOsListOfList.stream()
+						.flatMap(list -> list.stream().map(insVar -> insVar.getVariable()).distinct()
+								.map(var -> list.stream()
+										.filter(insVarDto -> insVarDto.getVariable() == var && (insVarDto.getVariable()
+												.getFormulaVariables().stream().map(formVar -> formVar.getFormula())
+												.allMatch(formla -> formla == formula)))
+										.collect(Collectors.toList())))
+						.filter(list -> list.size() > 0).collect(Collectors.toList())));
+		mapOfFormulaVars.entrySet().forEach(entry -> {
+			System.out.println(entry.getKey().getFormula_string() + ":");
+			entry.getValue().forEach(list -> {
+				System.out.println("size - " + list.size());
+				if (list.size() > 0) {
+					System.out.println("\t" + list.get(0).getVariable().getVariable_sign() + ":");
+					list.forEach(elem -> System.out.println("\t\t" + elem.getInserted_value()));
+				}
+			});
+			System.out.println(formulaService.evaluateFormula(entry.getKey(), entry.getValue()));
+		});
+		List<Domact> insertedDomacts = mapOfFormulaVars.entrySet().stream().map(entry -> entry.getKey())
+				.flatMap(formul -> formul.getCriteriaFormulas().stream()
+						.map(crForm -> crForm.getCriteria().getSubgroup().getDomact()).distinct())
+				.collect(Collectors.toList());
+
+		insertedDomacts.forEach(insDom -> {
+			System.out.println(insDom.getDomact_id() + ", " + insDom.getDomact_name() + ", " + insDom.getSubgroups());
+
+		});
+		for (int i = 0; i < insertedDomacts.size(); i++) {
+			int j = i;
+			if (insertedDomacts.stream().filter(elem -> elem.getDomact_id() == insertedDomacts.get(j).getDomact_id())
+					.count() > 1) {
+				insertedDomacts.remove(i);
+				i--;
+			}
+		}
+
+		Map<Domact, Map<Criteria, Double>> mapOfCriteriaResults = new HashMap<>();
+		insertedDomacts.forEach(insDomact -> {
+			if (mapOfCriteriaResults.get(insDomact) == null)
+				mapOfCriteriaResults.put(insDomact,
+						new TreeMap<>((k1, k2) -> k1.getCriteria_id() - k2.getCriteria_id()));
+			mapOfFormulaVars.entrySet().stream()
+					.filter(entry -> entry.getKey().getCriteriaFormulas().stream()
+							.map(crForm -> crForm.getCriteria().getSubgroup().getDomact()).distinct()
+							.allMatch(domact -> domact.getDomact_id() == insDomact.getDomact_id()))
+					.forEach(entry -> {
+						mapOfCriteriaResults.get(insDomact)
+								.put(entry.getKey().getCriteriaFormulas().stream().map(crForm -> crForm.getCriteria())
+										.findAny().orElse(null),
+										formulaService.evaluateFormula(entry.getKey(), entry.getValue()));
+					});
+		});
+		Map<Domact, Double> mapOfDomactResults = new TreeMap<>((k1, k2) -> k1.getDomact_id() - k2.getDomact_id());
+
+		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession
+				.getAttribute("normaStiintificaDTO") == null ? new NormaStiintificaDTO(1)
+						: (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
+
+		mapOfCriteriaResults.entrySet().stream().distinct().forEach(entry -> {
+			System.out.println(entry.getKey().getDomact_name() + " : "
+					+ (entry.getValue().entrySet().stream().map(entryElem->entryElem.getValue()).reduce(0.0, (d1, d2) -> d1 + d2)) / normaStiintificaDTO.getValue()); // Delete
+																														// this
+			mapOfDomactResults.put(entry.getKey(),
+					(entry.getValue().entrySet().stream().map(entryElem->entryElem.getValue()).reduce(0.0, (d1, d2) -> d1 + d2)) / normaStiintificaDTO.getValue());
+		});
+		httpSession.setAttribute("mapOfDomactResults", mapOfDomactResults);
+		httpSession.setAttribute("mapOfCriteriaResults", mapOfCriteriaResults);
+
 		return "redirect:/CriteriaSelectionForInsert";
 
 	}
+
+	@PostMapping("insertNormaStiintifica")
+	public String postNormaStiintifica(@ModelAttribute("normaStiintificaDTO") NormaStiintificaDTO normaStiintificaDTO,
+			Model model, HttpSession httpSession) {
+
+		httpSession.setAttribute("normaStiintificaDTO", normaStiintificaDTO);
+
+		return "redirect:/CriteriaSelectionForInsert";
+	}
+
 }

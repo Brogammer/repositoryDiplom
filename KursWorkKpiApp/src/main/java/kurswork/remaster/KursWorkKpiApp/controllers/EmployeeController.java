@@ -122,8 +122,6 @@ public class EmployeeController {
 		Set<InsertedVariable> insVars = employee.getInsertedVariables();
 		Date lastDate = insVars.stream().map(insVar -> insVar.getDatetime())
 				.max((date1, date2) -> date1.compareTo(date2)).orElse(null);
-		double result = formulaService.evaluateFormula(formula, employee, lastDate);
-		System.out.println(result);
 
 		System.out.println("Name:");
 		System.out.println(employee.getLogin());
@@ -138,41 +136,7 @@ public class EmployeeController {
 		List<Subgroup> insertedSubgroups = insertedCriterias.stream().map(insCriteria -> insCriteria.getSubgroup())
 				.distinct().collect(Collectors.toList());
 
-		List<Domact> insertedDomacts = insertedSubgroups.stream().map(insSubgroup -> insSubgroup.getDomact()).distinct()
-				.collect(Collectors.toList());
-		System.out.println(insertedDomacts.size());
-		insertedDomacts.stream().forEach(insDomact -> {
-			System.out.println(insDomact.getDomact_name() + ":");
-			insDomact.getSubgroups().stream().filter(subgr -> insertedSubgroups.contains(subgr)).forEach(insSubgr -> {
-				System.out.println("\t" + insSubgr.getSubgroup_name() + ":");
-				insSubgr.getCriterias().stream().filter(crit -> insertedCriterias.contains(crit)).forEach(insCrit -> {
-					System.out.println("\t\t" + insCrit.getCriteria_name() + ":");
-					insCrit.getCriteriaFormulas().stream()
-							.flatMap(crForm -> crForm.getFormula().getFormulaVariables().stream())
-							.flatMap(formVar -> formVar.getVariable().getInsertedVariables().stream())
-							.filter(insVar -> insVars.contains(insVar)).forEach(lastInsVars -> {
-								System.out.println("\t\t\t" + lastInsVars.getVariable().getVariable_sign() + " = "
-										+ lastInsVars.getInserted_value());
-							});
-				});
-			});
-		});
 		
-		List<List<Double>> criteriaResults = new ArrayList<>();
-		insertedDomacts.stream().forEach(insDomact -> {
-			criteriaResults.add(new ArrayList<>());
-			insDomact.getSubgroups().stream().filter(subgr -> insertedSubgroups.contains(subgr)).forEach(insSubgr -> {
-				insSubgr.getCriterias().stream().filter(crit -> insertedCriterias.contains(crit)).forEach(insCrit -> {
-					insCrit.getCriteriaFormulas().stream()
-							.map(crForm -> crForm.getFormula()).forEach(form -> {
-								criteriaResults.get(criteriaResults.size() - 1).add(formulaService.evaluateFormula(form, employee, lastDate));
-							});
-					
-				});
-			});
-		});
-		criteriaResults.forEach(res->System.out.println(res.stream().reduce(0.0, (d1,d2)-> d1 + d2)));
-
 		return "/RegistrationAndLogin/Test";
 	}
 
