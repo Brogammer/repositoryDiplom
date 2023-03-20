@@ -438,9 +438,46 @@ public class CriteriaController {
 		return "redirect:/CriteriaRegistration";
 	}
 
+	@GetMapping("/insertNormaStiintifica")
+	public String getNormaStiintifica(Model model, HttpSession httpSession) {
+
+		NormaStiintificaDTO dto = (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
+
+		model.addAttribute("normaStiintificaDTO", dto == null ? new NormaStiintificaDTO(0) : dto);
+		Boolean isNull = (Boolean) httpSession.getAttribute("isNull");
+		if (isNull == null) {
+
+			httpSession.setAttribute("isNull", false);
+			isNull = false;
+		}
+		
+		model.addAttribute("isNull", isNull);
+
+		return "/CriteriaPages/InsertNormaStiintifica";
+	}
+
+	@PostMapping("/insertNormaStiintifica")
+	public String postNormaStiintifica(@ModelAttribute("normaStiintificaDTO") NormaStiintificaDTO normaStiintificaDTO,
+			Model model, HttpSession httpSession) {
+
+		if (normaStiintificaDTO.getValue() == 0 || normaStiintificaDTO.getValue() < 0) {
+			httpSession.setAttribute("isNull", true);
+			return "redirect:/insertNormaStiintifica";
+		}
+
+		httpSession.setAttribute("normaStiintificaDTO", normaStiintificaDTO);
+		return "redirect:/CriteriaSelectionForInsert";
+	}
+
 	@SuppressWarnings("unchecked")
 	@GetMapping("/CriteriaSelectionForInsert")
 	public String getCriteriaInsertion(Model model, HttpSession httpSession) {
+
+		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
+
+		if (normaStiintificaDTO == null) {
+			return "redirect:/insertNormaStiintifica";
+		}
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Employee employee = employeeService.findByLogin(authentication.getName());
@@ -476,17 +513,13 @@ public class CriteriaController {
 		model.addAttribute("mapOfInsertedVariablesDTOList", mapOfInsertedVariablesDTOList);
 		model.addAttribute("SelectedUrlPath", "/VariablesListOfCriteria");
 		model.addAttribute("PostUrlPath", "/CriteriaSelectionForInsert");
+		model.addAttribute("is");
 
 		SearchSettingsDTO searchSettingsDTO = (SearchSettingsDTO) httpSession.getAttribute("searchDTO");
 
 		if (searchSettingsDTO == null) {
 			searchSettingsDTO = new SearchSettingsDTO();
 		}
-
-		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
-
-		model.addAttribute("normaStiintificaDTO",
-				normaStiintificaDTO == null ? new NormaStiintificaDTO(0) : normaStiintificaDTO);
 
 		model.addAttribute("searchDTO", searchSettingsDTO);
 
@@ -882,7 +915,7 @@ public class CriteriaController {
 	}
 
 	@SuppressWarnings("unchecked")
-	@PostMapping("submitVariableInserting")
+	@PostMapping("/submitVariableInserting")
 	public String submitVariableInserting(Model model, HttpSession httpSession) {
 		List<Criteria> criterias = criteriaService.findAll();
 		java.util.Date lastDate = Date.valueOf(LocalDate.now());
@@ -970,31 +1003,64 @@ public class CriteriaController {
 		});
 		Map<Domact, Double> mapOfDomactResults = new TreeMap<>((k1, k2) -> k1.getDomact_id() - k2.getDomact_id());
 
-		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession
-				.getAttribute("normaStiintificaDTO") == null ? new NormaStiintificaDTO(1)
-						: (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
+		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
 
+		if (normaStiintificaDTO == null) {
+
+			return "redirect:/CriteriaSelectionForInsert";
+		}
 		mapOfCriteriaResults.entrySet().stream().distinct().forEach(entry -> {
-			System.out.println(entry.getKey().getDomact_name() + " : "
-					+ (entry.getValue().entrySet().stream().map(entryElem->entryElem.getValue()).reduce(0.0, (d1, d2) -> d1 + d2)) / normaStiintificaDTO.getValue()); // Delete
-																														// this
+//			System.out.println(entry.getKey().getDomact_name() + " : "
+//					+ (entry.getValue().entrySet().stream().map(entryElem -> entryElem.getValue()).reduce(0.0,
+//							(d1, d2) -> d1 + d2)) / normaStiintificaDTO.getValue()); // Delete
+//			// this
 			mapOfDomactResults.put(entry.getKey(),
-					(entry.getValue().entrySet().stream().map(entryElem->entryElem.getValue()).reduce(0.0, (d1, d2) -> d1 + d2)) / normaStiintificaDTO.getValue());
+					(entry.getValue().entrySet().stream().map(entryElem -> entryElem.getValue()).reduce(0.0,
+							(d1, d2) -> d1 + d2)));
 		});
 		httpSession.setAttribute("mapOfDomactResults", mapOfDomactResults);
 		httpSession.setAttribute("mapOfCriteriaResults", mapOfCriteriaResults);
 
-		return "redirect:/CriteriaSelectionForInsert";
+		return "redirect:/CriteriaEvaluationResult";
 
 	}
 
-	@PostMapping("insertNormaStiintifica")
-	public String postNormaStiintifica(@ModelAttribute("normaStiintificaDTO") NormaStiintificaDTO normaStiintificaDTO,
-			Model model, HttpSession httpSession) {
+	@SuppressWarnings("unchecked")
+	@GetMapping("/CriteriaEvaluationResult")
+	public String getCriteriaEvalResult(Model model, HttpSession httpSession) {
 
-		httpSession.setAttribute("normaStiintificaDTO", normaStiintificaDTO);
+		Map<Domact, Double> mapOfDomactResults = (Map<Domact, Double>) httpSession.getAttribute("mapOfDomactResults");
+		Map<Domact, Map<Criteria, Double>> mapOfCriteriaResults = (Map<Domact, Map<Criteria, Double>>) httpSession
+				.getAttribute("mapOfCriteriaResults");
+		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
 
-		return "redirect:/CriteriaSelectionForInsert";
+		
+		
+		if (mapOfCriteriaResults == null || mapOfDomactResults == null)
+			return "redirect:/CriteriaSelectionForInsert";
+		if (normaStiintificaDTO == null)
+			return "redirect:/insertNormaStiintifica";
+			
+		
+		
+		Map<Domact, Double> sortedMapOfDomactResults = new TreeMap<>((k1, k2) -> k1.getDomact_id() - k2.getDomact_id());
+
+		sortedMapOfDomactResults.putAll(mapOfDomactResults);
+
+		Map<Domact, Map<Criteria, Double>> sortedMapOfCriteriaResults = new TreeMap<>(
+				(k1, k2) -> k1.getDomact_id() - k2.getDomact_id());
+
+		sortedMapOfCriteriaResults.putAll(mapOfCriteriaResults);
+
+
+		
+
+		model.addAttribute("mapOfCriteriaResults", mapOfCriteriaResults);
+		model.addAttribute("mapOfDomactResults", mapOfDomactResults);
+		model.addAttribute("normaStiintificaDTO",normaStiintificaDTO);
+		
+
+		return "/CriteriaPages/CriteriaResult";
 	}
 
 }

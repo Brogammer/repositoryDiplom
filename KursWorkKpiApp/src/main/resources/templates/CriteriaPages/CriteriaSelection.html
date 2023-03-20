@@ -1,25 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th = "http://thymeleaf.org">
+<html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
-<meta charset="ISO-8859-1" name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="ISO-8859-1" name="viewport"
+	content="width=device-width, initial-scale=1" />
 <title>Position Registration</title>
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-	crossorigin="anonymous"/>
+	crossorigin="anonymous" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
 <style type="text/css">
-img{
+img {
 	max-width: 100px;
 }
-.searchPanel{
+
+.searchPanel {
 	display: flex;
 	flex-wrap: wrap;
-
 }
 </style>
 
@@ -27,7 +31,7 @@ img{
 
 
 <body>
-<nav class="navbar navbar-inverse navbar-fixed-top">
+	<nav class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed"
@@ -37,127 +41,152 @@ img{
 						class="icon-bar"></span> <span class="icon-bar"></span> <span
 						class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#" th:href="@{/}">Criteria Selection</a>
+				<a class="navbar-brand" href="#" th:href="@{/}">Criteria
+					Selection</a>
 			</div>
 		</div>
 	</nav>
 	<br>
 	<br>
 	<br>
-	
-	
-<div class="container">
-	<h2>Criteria Selection</h2>
-	<p>Click on the collapsible panel to open and close it.</p>
-	
-	<form th:action="@{${PostUrlPath}}" th:method="post" th:object = ${searchDTO}>
-   		<div class="form-group searchPanel">
-			
-			
-			
-			
-			<input id="firstName" class="form-control" th:field="*{string}"
-							 autofocus="autofocus" />
-			
-			<select id="employeeList" th:field = "*{type}">	
-			    <option value="1">find in domact name</option>
-			    <option value="2">find in subgroup name</option>
-			    <option value="3">find in criteria name</option>
-			    <option value="4">find in criteria description</option>		 
-			</select>
-			
-			<button type="submit" class="btn btn-success">Search</button>
-			
-		</div>
-   </form>
-	
-	<div class="panel-group">
-		<div class="panel panel-default"  th:each="domact : ${domacts}" th:if = "${domact.getSubgroups().size() > 0}">
-			<div class="panel-heading">
-				<h4 class="panel-title"> <a data-toggle="collapse" href="#collapse1" th:attr="href=${'#d'+domact.getDomact_id()}" th:text="${domact.getDomact_name()}">Collapsible panel1</a></h4>
+
+
+	<div class="container">
+		<h2>Criteria Selection</h2>
+		<p>Click on the collapsible panel to open and close it.</p>
+
+		<form th:action="@{${PostUrlPath}}" th:method="post"
+			th:object=${searchDTO}>
+			<div class="form-group searchPanel">
+
+
+
+
+				<input id="firstName" class="form-control" th:field="*{string}"
+					autofocus="autofocus" /> <select id="employeeList"
+					th:field="*{type}">
+					<option value="1">find in domact name</option>
+					<option value="2">find in subgroup name</option>
+					<option value="3">find in criteria name</option>
+					<option value="4">find in criteria description</option>
+				</select>
+
+				<button type="submit" class="btn btn-success">Search</button>
+
 			</div>
-			<div id="collapse1" th:attr="id=${'d'+domact.getDomact_id()}" class="panel-collapse ">
-				<div class="panel-body">
-				
-				
-				
-					<div class="panel panel-default"  th:each="subgroup : ${domact.getSubgroups()}"  th:if = "${subgroup.getCriterias().size() > 0}">
-						<div class="panel-heading">
-							<h4 class="panel-title"> <a data-toggle="collapse" href="#collapse2" th:attr="href=${'#s'+subgroup.getSubgroup_id() +  domact.getDomact_id()}" th:text="${subgroup.getSubgroup_name()}">Collapsible panel2</a></h4>
-						</div>
-						<div id="collapse2" th:attr="id=${'s'+subgroup.getSubgroup_id() +  domact.getDomact_id()}" class="panel-collapse ">
-							<div class="panel-body">
-							
-							<div class="panel panel-default"  th:each="criteria : ${subgroup.getCriterias()}">
-								
-								<div id="collapse4" th:attr="id=${'c'+criteria.getCriteria_id() + subgroup.getSubgroup_id() +  domact.getDomact_id()}" class="panel-collapse">
-									<div class="panel-body">
-									
-									
-										
-										<p th:text = "${criteria.getCriteria_name()}"></p>
-											<table class="table table-striped">
-											  <thead>
-											    <tr>
-											      
-											      <th scope="col">Criteria description</th>
-											      
-											    </tr>
-											  </thead>
-											  <tbody>
-											    <tr style="max-height: 1000px">
-											      <td th:text = "${criteria.getCriteria_descr()}" ></td>
-											     </tr>
-											     <tr>
-											      <td>
-											      	
-											      	<div  class="form-group" th:each = "insVar : ${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id())}">
-														<p th:text = "${insVar.getVariable().getVariable_sign() + ' = '  + insVar.getInserted_value()}"></p>
-														<p  th:text = "${'Comment: '+insVar.getComment()}"></p>
-														
-													</div>
-											      	
-											     	<div class="form-group">
-														<a th:if= "${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id()) == null}" th:href = "@{${SelectedUrlPath +'/'+ criteria.getCriteria_id()}}" class="btn btn-success">Insert</a>
-														<a th:if="${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id()) != null}" style='background-color: gray;' th:href = "@{/DeleteCriteriaValues/forInsert/{id}(id = ${criteria.getCriteria_id()})}" class="btn btn-success">Insert again</a>
-													
-													</div>
-													
-											      </td>
-											      
-											    </tr>
-											    
-											  </tbody>
-											</table>
-										
-										
+		</form>
+
+		<div class="panel-group">
+			<div class="panel panel-default" th:each="domact : ${domacts}"
+				th:if="${domact.getSubgroups().size() > 0}">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" href="#collapse1"
+							th:attr="href=${'#d'+domact.getDomact_id()}"
+							th:text="${domact.getDomact_name()}">Collapsible panel1</a>
+					</h4>
+				</div>
+				<div id="collapse1" th:attr="id=${'d'+domact.getDomact_id()}"
+					class="panel-collapse ">
+					<div class="panel-body">
+
+
+
+						<div class="panel panel-default"
+							th:each="subgroup : ${domact.getSubgroups()}"
+							th:if="${subgroup.getCriterias().size() > 0}">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" href="#collapse2"
+										th:attr="href=${'#s'+subgroup.getSubgroup_id() +  domact.getDomact_id()}"
+										th:text="${subgroup.getSubgroup_name()}">Collapsible
+										panel2</a>
+								</h4>
+							</div>
+							<div id="collapse2"
+								th:attr="id=${'s'+subgroup.getSubgroup_id() +  domact.getDomact_id()}"
+								class="panel-collapse ">
+								<div class="panel-body">
+
+									<div class="panel panel-default"
+										th:each="criteria : ${subgroup.getCriterias()}">
+
+										<div id="collapse4"
+											th:attr="id=${'c'+criteria.getCriteria_id() + subgroup.getSubgroup_id() +  domact.getDomact_id()}"
+											class="panel-collapse">
+											<div class="panel-body">
+
+
+
+												<p th:text="${criteria.getCriteria_name()}"></p>
+												<table class="table table-striped">
+													<thead>
+														<tr>
+
+															<th scope="col">Criteria description</th>
+
+														</tr>
+													</thead>
+													<tbody>
+														<tr style="max-height: 1000px">
+															<td th:text="${criteria.getCriteria_descr()}"></td>
+														</tr>
+														<tr>
+															<td>
+
+																<div class="form-group"
+																	th:each="insVar : ${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id())}">
+																	<p
+																		th:text="${insVar.getVariable().getVariable_sign() + ' = '  + insVar.getInserted_value()}"></p>
+																	<p th:text="${'Comment: '+insVar.getComment()}"></p>
+
+																</div>
+
+																<div class="form-group">
+																	<a
+																		th:if="${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id()) == null}"
+																		th:href="@{${SelectedUrlPath +'/'+ criteria.getCriteria_id()}}"
+																		class="btn btn-success">Insert</a> <a
+																		th:if="${mapOfInsertedVariablesDTOList.get(criteria.getCriteria_id()) != null}"
+																		style='background-color: gray;'
+																		th:href="@{/DeleteCriteriaValues/forInsert/{id}(id = ${criteria.getCriteria_id()})}"
+																		class="btn btn-success">Insert again</a>
+
+																</div>
+
+															</td>
+
+														</tr>
+
+													</tbody>
+												</table>
+
+
+											</div>
+										</div>
 									</div>
+
+
+
+
 								</div>
 							</div>
-							
-										
-								
-								
-							</div>
 						</div>
+
+
+
 					</div>
-					
-					
-										
 				</div>
 			</div>
 		</div>
+		<div class="form-group">
+			<form th:action="@{submitVariableInserting}" th:method="post">
+			
+				<a th:href = "@{/insertNormaStiintifica}" class="btn btn-success">Back</a>
+				<button type="submit" class="btn btn-success">Submit</button>
+			</form>
+		</div>
+		
 	</div>
-	<div class="form-group">
-		<form th:action="@{insertNormaStiintifica}" th:method="post" th:object= "${normaStiintificaDTO}">
-			<label for = "norma">Norma Striintifica</label> <br>
-			<input type="number" step = "any" th:field = "*{value}" id = "norma" required autofocus> <br><br>	
-			<button type="submit" class="btn btn-success">Enter Norma Stiistifica</button>
-		</form>
-	</div>
-	<form th:action="@{submitVariableInserting}" th:method="post">
-		<button type="submit" class="btn btn-success">Submit</button>
-	</form>
-</div>
 </body>
 </html>
