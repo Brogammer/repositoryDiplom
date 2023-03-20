@@ -450,7 +450,7 @@ public class CriteriaController {
 			httpSession.setAttribute("isNull", false);
 			isNull = false;
 		}
-		
+
 		model.addAttribute("isNull", isNull);
 
 		return "/CriteriaPages/InsertNormaStiintifica";
@@ -766,9 +766,9 @@ public class CriteriaController {
 						.filter(singleInsVar -> singleInsVar.getVariable().getCount().equals("1") && singleInsVar
 								.getVariable().getVariable_sign().equals(insVar.getVariable().getCount()))
 						.findAny().orElse(null).getInserted_value())).forEach(i -> {
-							multipliedMultVariableDTOs
-									.add(new InsertedVariableDTO(insVar.getDatetime(), insVar.getInserted_value(),
-											insVar.getEmployee(), insVar.getVariable(), insVar.getComment()));
+							multipliedMultVariableDTOs.add(new InsertedVariableDTO(insVar.getDatetime(),
+									insVar.getInserted_value(), insVar.getEmployee(), insVar.getVariable(),
+									insVar.getComment(), "(" + (i + 1) + ")"));
 						});
 			});
 			httpSession.setAttribute("multipliedVariableDTO_" + id, multipliedMultVariableDTOs);
@@ -1014,9 +1014,8 @@ public class CriteriaController {
 //					+ (entry.getValue().entrySet().stream().map(entryElem -> entryElem.getValue()).reduce(0.0,
 //							(d1, d2) -> d1 + d2)) / normaStiintificaDTO.getValue()); // Delete
 //			// this
-			mapOfDomactResults.put(entry.getKey(),
-					(entry.getValue().entrySet().stream().map(entryElem -> entryElem.getValue()).reduce(0.0,
-							(d1, d2) -> d1 + d2)));
+			mapOfDomactResults.put(entry.getKey(), (entry.getValue().entrySet().stream()
+					.map(entryElem -> entryElem.getValue()).reduce(0.0, (d1, d2) -> d1 + d2)));
 		});
 		httpSession.setAttribute("mapOfDomactResults", mapOfDomactResults);
 		httpSession.setAttribute("mapOfCriteriaResults", mapOfCriteriaResults);
@@ -1034,15 +1033,11 @@ public class CriteriaController {
 				.getAttribute("mapOfCriteriaResults");
 		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
 
-		
-		
 		if (mapOfCriteriaResults == null || mapOfDomactResults == null)
 			return "redirect:/CriteriaSelectionForInsert";
 		if (normaStiintificaDTO == null)
 			return "redirect:/insertNormaStiintifica";
-			
-		
-		
+
 		Map<Domact, Double> sortedMapOfDomactResults = new TreeMap<>((k1, k2) -> k1.getDomact_id() - k2.getDomact_id());
 
 		sortedMapOfDomactResults.putAll(mapOfDomactResults);
@@ -1052,13 +1047,9 @@ public class CriteriaController {
 
 		sortedMapOfCriteriaResults.putAll(mapOfCriteriaResults);
 
-
-		
-
 		model.addAttribute("mapOfCriteriaResults", mapOfCriteriaResults);
 		model.addAttribute("mapOfDomactResults", mapOfDomactResults);
-		model.addAttribute("normaStiintificaDTO",normaStiintificaDTO);
-		
+		model.addAttribute("normaStiintificaDTO", normaStiintificaDTO);
 
 		return "/CriteriaPages/CriteriaResult";
 	}

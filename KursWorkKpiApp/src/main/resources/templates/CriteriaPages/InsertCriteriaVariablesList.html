@@ -65,8 +65,9 @@
 					  </thead>
 					  <tbody>
 					    <tr th:each = "insertVariable : ${insertVariableDTOList}" th:if="${insertVariable.getVariable().getCount().contains(VariableListType)}">
-					     	<th scope="row" th:text = "${insertVariableDTOList.indexOf(insertVariable)}"></th>
-					     	<td th:text = "${insertVariable.getVariable().getVariable_sign()}"></td>
+					     	<th scope="row" th:text = "${insertVariableDTOList.indexOf(insertVariable) + 1}"></th>
+					     	<td th:if= "${insertVariable.getIndex() == null}" th:text = "${insertVariable.getVariable().getVariable_sign()}"></td>
+					     	<td th:if= "${insertVariable.getIndex() != null}" th:text = "${insertVariable.getVariable().getVariable_sign() + ' ' + insertVariable.getIndex()}"></td>
 					     	<td>
 					     		<div class="form-group">
 									<a class="btn btn-success" th:if="${insertVariable.getInserted_value() == null}" 

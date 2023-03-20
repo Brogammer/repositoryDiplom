@@ -11,7 +11,15 @@ public class InsertedVariableDTO {
 	private String inserted_value;
 	private Employee employee;
 	private Variable variable;
+	private String index;
 	private String comment;
+	
+	public String getIndex() {
+		return index;
+	}
+	public void setIndex(String index) {
+		this.index = index;
+	}
 	public Date getDatetime() {
 		return datetime;
 	}
@@ -50,6 +58,15 @@ public class InsertedVariableDTO {
 		this.inserted_value = inserted_value;
 		this.employee = employee;
 		this.variable = variable;
+		this.index = null;
+	}
+	public InsertedVariableDTO(Date datetime, String inserted_value, Employee employee, Variable variable, String comment, String index) {
+		super();
+		this.datetime = datetime;
+		this.inserted_value = inserted_value;
+		this.employee = employee;
+		this.variable = variable;
+		this.index = index;
 	}
 	public InsertedVariableDTO() {
 		super();
