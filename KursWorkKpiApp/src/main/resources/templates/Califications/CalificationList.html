@@ -63,7 +63,7 @@
 					  <tbody>
 					    <tr th:each = "calificatDTO : ${calificatDTOList}">
 					     	<th scope="row" th:text = "${calificatDTOList.indexOf(calificatDTO)}"></th>
-					     	<td th:text = "${calificatDTO.getLeft_bound() + '<=_<' + calificatDTO.getRight_bound()}"></td>
+					     	<td th:text = "${calificatDTO.getLeft_bound() + '<=_<=' + calificatDTO.getRight_bound()}"></td>
 					     	<td th:text = "${calificatDTO.getCalificat_coef() + ' ('+calificatDTO.getCalificat_symbol()+')'}"></td>
 					     	<td>
 					     		<div class="form-group">

@@ -25,6 +25,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 
+import com.spire.doc.Document;
+import com.spire.doc.FileFormat;
+import com.spire.doc.Section;
+import com.spire.doc.Table;
+
 import kurswork.remaster.KursWorkKpiApp.dto.CalificatRegistrationDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.CriteriaDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.CriteriaFormulaDTO;
@@ -36,8 +41,10 @@ import kurswork.remaster.KursWorkKpiApp.dto.NormaStiintificaDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.SearchSettingsDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.SubgroupRegistrationDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.VariableDTO;
+import kurswork.remaster.KursWorkKpiApp.model.Calification;
 import kurswork.remaster.KursWorkKpiApp.model.Criteria;
 import kurswork.remaster.KursWorkKpiApp.model.Domact;
+import kurswork.remaster.KursWorkKpiApp.model.DomactPositionCalif;
 import kurswork.remaster.KursWorkKpiApp.model.Employee;
 import kurswork.remaster.KursWorkKpiApp.model.Formula;
 import kurswork.remaster.KursWorkKpiApp.model.InsertedVariable;
@@ -49,6 +56,7 @@ import kurswork.remaster.KursWorkKpiApp.services.DomactService;
 import kurswork.remaster.KursWorkKpiApp.services.EmployeeService;
 import kurswork.remaster.KursWorkKpiApp.services.FormulaService;
 import kurswork.remaster.KursWorkKpiApp.services.FormulaVariableService;
+import kurswork.remaster.KursWorkKpiApp.services.GenerationService;
 import kurswork.remaster.KursWorkKpiApp.services.InsertedVariableService;
 import kurswork.remaster.KursWorkKpiApp.services.SubgroupService;
 import kurswork.remaster.KursWorkKpiApp.services.VariableService;
@@ -56,6 +64,8 @@ import kurswork.remaster.KursWorkKpiApp.services.VariableService;
 @Controller
 public class CriteriaController {
 
+	@Autowired
+	GenerationService generationService;
 	@Autowired
 	DomactService domactService;
 	@Autowired
@@ -972,21 +982,14 @@ public class CriteriaController {
 						.map(crForm -> crForm.getCriteria().getSubgroup().getDomact()).distinct())
 				.collect(Collectors.toList());
 
-		insertedDomacts.forEach(insDom -> {
-			System.out.println(insDom.getDomact_id() + ", " + insDom.getDomact_name() + ", " + insDom.getSubgroups());
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Employee employee = employeeService.findByLogin(authentication.getName());
 
-		});
-		for (int i = 0; i < insertedDomacts.size(); i++) {
-			int j = i;
-			if (insertedDomacts.stream().filter(elem -> elem.getDomact_id() == insertedDomacts.get(j).getDomact_id())
-					.count() > 1) {
-				insertedDomacts.remove(i);
-				i--;
-			}
-		}
+		List<Domact> allDomacts = employee.getPosition().getDPCs().stream().map(dpc -> dpc.getDomact()).distinct()
+				.collect(Collectors.toList());
 
 		Map<Domact, Map<Criteria, Double>> mapOfCriteriaResults = new HashMap<>();
-		insertedDomacts.forEach(insDomact -> {
+		allDomacts.forEach(insDomact -> {
 			if (mapOfCriteriaResults.get(insDomact) == null)
 				mapOfCriteriaResults.put(insDomact,
 						new TreeMap<>((k1, k2) -> k1.getCriteria_id() - k2.getCriteria_id()));
@@ -1051,6 +1054,31 @@ public class CriteriaController {
 		model.addAttribute("mapOfDomactResults", mapOfDomactResults);
 		model.addAttribute("normaStiintificaDTO", normaStiintificaDTO);
 
+		Map<Domact, Calification> domactCalificationResult = new HashMap<>();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Employee employee = employeeService.findByLogin(authentication.getName());
+		List<DomactPositionCalif> dPCs = employee.getPosition().getDPCs().stream().collect(Collectors.toList());
+
+		sortedMapOfDomactResults.entrySet().forEach(entry -> {
+
+			domactCalificationResult.put(entry.getKey(),
+					dPCs.stream().filter(dpc -> dpc.getDomact().getDomact_id() == entry.getKey().getDomact_id())
+							.map(dpc -> dpc.getCalification())
+							.filter(calif -> calif.getLeft_bound() <= (entry.getValue() / normaStiintificaDTO.getValue())
+									&& (entry.getValue() / normaStiintificaDTO.getValue()) <= calif.getRight_bound())
+							.findAny().orElse(null));
+
+		});
+		
+		model.addAttribute("domactCalificationResult", domactCalificationResult);
+
+		Document document = new Document();
+		domactCalificationResult.entrySet().forEach(entry->{
+			generationService.addTable(document, mapOfCriteriaResults.get(entry.getKey()));
+			document.addSection().addParagraph().appendText("\n");
+		});
+		document.saveToFile(employee.getLogin() + "ResultsTest.docx", FileFormat.Docx);
+		
 		return "/CriteriaPages/CriteriaResult";
 	}
 
