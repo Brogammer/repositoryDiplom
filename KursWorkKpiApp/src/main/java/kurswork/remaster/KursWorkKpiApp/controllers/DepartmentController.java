@@ -33,9 +33,6 @@ public class DepartmentController {
 		
 		List<Department> departments = departmentService.findAll()
 				.stream()
-				.filter(dept->dept.getPositions()
-						.stream()
-						.count() > 0)
 				.collect(Collectors.toList());
 		model.addAttribute("departmentList", departments);
 		model.addAttribute("department", new Department());
@@ -82,9 +79,6 @@ public class DepartmentController {
 	public String getDepartmentSelectionCalif(Model model, HttpSession httpSession) {
 		List<Department> departments = departmentService.findAll()
 				.stream()
-				.filter(dept->dept.getPositions()
-						.stream()
-						.count() > 0)
 				.collect(Collectors.toList());
 		
 		httpSession.setAttribute("departmentList", departments);

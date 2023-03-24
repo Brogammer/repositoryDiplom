@@ -1,5 +1,6 @@
 package kurswork.remaster.KursWorkKpiApp.dto;
 
+import kurswork.remaster.KursWorkKpiApp.model.Department;
 import kurswork.remaster.KursWorkKpiApp.model.Position;
 
 public class EmployeeRegistrationDTO {
@@ -8,6 +9,7 @@ public class EmployeeRegistrationDTO {
 	private String login;
 	private String password;
 	private Position position;
+	private Department department;
 	public String getName() {
 		return name;
 	}
@@ -35,16 +37,26 @@ public class EmployeeRegistrationDTO {
 	public Position getPosition() {
 		return position;
 	}
+	
+	public Department getDepartment() {
+		return department;
+	}
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
 	public void setPosition(Position position) {
 		this.position = position;
 	}
-	public EmployeeRegistrationDTO(String name, String surname, String login, String password, Position position) {
+	
+	public EmployeeRegistrationDTO(String name, String surname, String login, String password, Position position,
+			Department department) {
 		super();
 		this.name = name;
 		this.surname = surname;
 		this.login = login;
 		this.password = password;
 		this.position = position;
+		this.department = department;
 	}
 	public EmployeeRegistrationDTO() {
 		super();

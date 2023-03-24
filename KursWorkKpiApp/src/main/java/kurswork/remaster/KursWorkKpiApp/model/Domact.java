@@ -1,5 +1,6 @@
 package kurswork.remaster.KursWorkKpiApp.model;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -24,7 +25,7 @@ public class Domact {
 	@OneToMany(mappedBy = "domact")
 	private Set<DomactPositionCalif> DPCs;
 	@OneToMany(mappedBy = "domact",fetch = FetchType.EAGER)
-	private Set<Subgroup> Subgroups;
+	private List<Subgroup> Subgroups;
 	
 	@OneToMany(mappedBy = "domact")
 	private Set<CalculatedDomact> calculatedDomacts;
@@ -53,11 +54,11 @@ public class Domact {
 		DPCs = dPCs;
 	}
 
-	public Set<Subgroup> getSubgroups() {
+	public List<Subgroup> getSubgroups() {
 		return Subgroups;
 	}
 
-	public void setSubgroups(Set<Subgroup> subgroups) {
+	public void setSubgroups(List<Subgroup> subgroups) {
 		Subgroups = subgroups;
 	}
 
@@ -69,7 +70,7 @@ public class Domact {
 		this.calculatedDomacts = calculatedDomacts;
 	}
 
-	public Domact(int domact_id, String domact_name, Set<DomactPositionCalif> dPCs, Set<Subgroup> subgroups,
+	public Domact(int domact_id, String domact_name, Set<DomactPositionCalif> dPCs, List<Subgroup> subgroups,
 			Set<CalculatedDomact> calculatedDomacts) {
 		super();
 		this.domact_id = domact_id;

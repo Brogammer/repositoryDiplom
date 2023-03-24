@@ -34,7 +34,7 @@ public class CalificationController {
 		Position position = (Position) httpSession.getAttribute("selectedPosition");
 		Domact domact = (Domact) httpSession.getAttribute("selectedDomact");
 		if (position == null || domact == null) {
-			return "redirect:/DepartmentSelectionCalif";
+			return "redirect:/PositionSelectionCalif";
 		}
 		
 		model.addAttribute("domact", domact);
@@ -175,7 +175,7 @@ public class CalificationController {
 		httpSession.removeAttribute("selectedPosition");
 		httpSession.removeAttribute("selectedDomact");
 		
-		return "redirect:/DepartmentSelectionCalif";
+		return "redirect:/PositionSelectionCalif";
 		
 	}
 }

@@ -66,7 +66,7 @@ public class EmployeeController {
 			return "redirect:/DepartmentSelection";
 		}
 
-		List<Position> positions = positionService.findAllByDepartmentId(selectedDepartment.getDepartment_id());
+		List<Position> positions = positionService.findAll();
 
 		EmployeeRegistrationDTO emptyDTO = new EmployeeRegistrationDTO();
 		emptyDTO.setPosition(new Position());
@@ -94,7 +94,8 @@ public class EmployeeController {
 			List<Position> positions = (List<Position>) httpSession.getAttribute("positionList");
 			Position chosedPosition = positionService.findById(dto.getPosition().getPosition_id());
 			dto.setPosition(chosedPosition);
-
+			Department selectedDepartment = (Department) httpSession.getAttribute("selectedDepartment");
+			dto.setDepartment(selectedDepartment);
 			employeeService.save(dto);
 			httpSession.removeAttribute("positionList");
 			httpSession.removeAttribute("selectedDepartment");
@@ -113,28 +114,28 @@ public class EmployeeController {
 		model.addAttribute("userName", authentication.getName());
 		model.addAttribute("roles", authentication.getAuthorities());
 
-		Criteria criteria = criteriaService.findCriteriaById(13);
-		System.out.println("Critera name:\n\t" + criteria.getCriteria_name());
-		System.out.println("Critera decription:\n\t" + criteria.getCriteria_descr());
-		Formula formula = criteria.getCriteriaFormulas().stream().findAny().orElse(null).getFormula();
-		Employee employee = employeeService.findByLogin(authentication.getName());
-
-		Set<InsertedVariable> insVars = employee.getInsertedVariables();
-		Date lastDate = insVars.stream().map(insVar -> insVar.getDatetime())
-				.max((date1, date2) -> date1.compareTo(date2)).orElse(null);
-
-		System.out.println("Name:");
-		System.out.println(employee.getLogin());
-
-		System.out.println("Insertion date:" + lastDate.toString());
-		insVars.removeIf(insVar -> insVar.getDatetime().compareTo(lastDate) != 0);
-		List<Criteria> insertedCriterias = insVars.stream()
-				.flatMap(insVar -> insVar.getVariable().getFormulaVariables().stream())
-				.flatMap(formVar -> formVar.getFormula().getCriteriaFormulas().stream())
-				.map(critForm -> critForm.getCriteria()).distinct().collect(Collectors.toList());
-
-		List<Subgroup> insertedSubgroups = insertedCriterias.stream().map(insCriteria -> insCriteria.getSubgroup())
-				.distinct().collect(Collectors.toList());
+//		Criteria criteria = criteriaService.findCriteriaById(13);
+//		System.out.println("Critera name:\n\t" + criteria.getCriteria_name());
+//		System.out.println("Critera decription:\n\t" + criteria.getCriteria_descr());
+//		Formula formula = criteria.getCriteriaFormulas().stream().findAny().orElse(null).getFormula();
+//		Employee employee = employeeService.findByLogin(authentication.getName());
+//
+//		Set<InsertedVariable> insVars = employee.getInsertedVariables();
+//		Date lastDate = insVars.stream().map(insVar -> insVar.getDatetime())
+//				.max((date1, date2) -> date1.compareTo(date2)).orElse(null);
+//
+//		System.out.println("Name:");
+//		System.out.println(employee.getLogin());
+//
+//		System.out.println("Insertion date:" + lastDate.toString());
+//		insVars.removeIf(insVar -> insVar.getDatetime().compareTo(lastDate) != 0);
+//		List<Criteria> insertedCriterias = insVars.stream()
+//				.flatMap(insVar -> insVar.getVariable().getFormulaVariables().stream())
+//				.flatMap(formVar -> formVar.getFormula().getCriteriaFormulas().stream())
+//				.map(critForm -> critForm.getCriteria()).distinct().collect(Collectors.toList());
+//
+//		List<Subgroup> insertedSubgroups = insertedCriterias.stream().map(insCriteria -> insCriteria.getSubgroup())
+//				.distinct().collect(Collectors.toList());
 
 		
 		return "/RegistrationAndLogin/Test";

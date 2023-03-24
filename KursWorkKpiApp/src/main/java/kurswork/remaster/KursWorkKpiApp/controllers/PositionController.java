@@ -29,14 +29,13 @@ public class PositionController {
 	@GetMapping("/PositionRegistration")
 	public String getPositionRegistration(Model model, HttpSession httpSession) {
 		
-		Department emptyDepartment = new Department();
+	
 		PositionRegistrationDTO emptyDTO = new PositionRegistrationDTO();
-		emptyDTO.setDepartment(emptyDepartment);
-		model.addAttribute("position", emptyDTO);
-		List<Department> departments = departmentService.findAll();
 		
-		httpSession.setAttribute("departmentList", departments);
-		model.addAttribute("departmentList", departments);
+		model.addAttribute("position", emptyDTO);
+		
+		
+		
 		model.addAttribute("success", false);
 		return "/DepartmentsAndPositions/PositionRegistration";
 	}
@@ -44,15 +43,13 @@ public class PositionController {
 	@PostMapping("/PositionRegistration")
 	public String postPositionRegistration(@ModelAttribute("position")PositionRegistrationDTO positionRegistrationDTO, Model model, HttpSession httpSession) {
 		
-		Department selectedDepartment = departmentService.findById(positionRegistrationDTO.getDepartment().getDepartment_id());
-		positionRegistrationDTO.setDepartment(selectedDepartment);
+		
 		positionService.save(positionRegistrationDTO);
 		
 		
 		
-		Department emptyDepartment = new Department();
 		PositionRegistrationDTO emptyDTO = new PositionRegistrationDTO();
-		emptyDTO.setDepartment(emptyDepartment);
+		
 		@SuppressWarnings("unchecked")
 		List<Department> departments = (List<Department>) httpSession.getAttribute("departmentList");
 		model.addAttribute("position", emptyDTO);
@@ -63,18 +60,14 @@ public class PositionController {
 	@GetMapping("/PositionSelectionCalif")
 	public String getPositionSelection(Model model, HttpSession httpSession) {
 		
-		Department department = (Department) httpSession.getAttribute("selectedDepartment");
-		if (department == null) {
-			return "redirect:/DepartmentSelectionCalif";
-		}
 		
-		List<Position> positions = positionService.findAllByDepartmentId(department.getDepartment_id());
+		
+		List<Position> positions = positionService.findAll();
 		httpSession.setAttribute("positionList", positions);
 		model.addAttribute("positionList", positions);
 		model.addAttribute("position", new Position());
 		model.addAttribute("PostUrl", "/PositionSelectionForCalificat");
 		
-		httpSession.removeAttribute("selectedDepartment");
 		return "/DepartmentsAndPositions/PositionSelection";
 	}
 	

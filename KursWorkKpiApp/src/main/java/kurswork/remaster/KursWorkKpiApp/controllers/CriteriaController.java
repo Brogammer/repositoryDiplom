@@ -571,7 +571,7 @@ public class CriteriaController {
 				domact.setSubgroups(domact.getSubgroups().stream().filter(subgr -> Stream.of(prompts).anyMatch(
 						prompt -> subgr.getSubgroup_name().trim().toLowerCase().contains(prompt.trim().toLowerCase())))
 						.sorted((subgr1, subgr2) -> subgr1.getSubgroup_id() - subgr2.getSubgroup_id())
-						.collect(Collectors.toSet()));
+						.collect(Collectors.toList()));
 			});
 
 			break;
@@ -589,7 +589,7 @@ public class CriteriaController {
 									.anyMatch(prompt -> criteria.getCriteria_name().trim().toLowerCase()
 											.contains(prompt.trim().toLowerCase())))
 							.sorted((cr1, cr2) -> cr1.getCriteria_id() - cr2.getCriteria_id())
-							.collect(Collectors.toSet()));
+							.collect(Collectors.toList()));
 
 				});
 
@@ -610,7 +610,7 @@ public class CriteriaController {
 									.anyMatch(prompt -> criteria.getCriteria_descr().trim().toLowerCase()
 											.contains(prompt.trim().toLowerCase())))
 							.sorted((cr1, cr2) -> cr1.getCriteria_id() - cr2.getCriteria_id())
-							.collect(Collectors.toSet()));
+							.collect(Collectors.toList()));
 
 				});
 
@@ -1013,16 +1013,23 @@ public class CriteriaController {
 			return "redirect:/CriteriaSelectionForInsert";
 		}
 		mapOfCriteriaResults.entrySet().stream().distinct().forEach(entry -> {
-//			System.out.println(entry.getKey().getDomact_name() + " : "
-//					+ (entry.getValue().entrySet().stream().map(entryElem -> entryElem.getValue()).reduce(0.0,
-//							(d1, d2) -> d1 + d2)) / normaStiintificaDTO.getValue()); // Delete
-//			// this
+			System.out.println(entry.getKey().getDomact_name() + " : "
+					+ (entry.getValue().entrySet().stream().map(entryElem -> entryElem.getValue()).reduce(0.0,
+							(d1, d2) -> d1 + d2)) / normaStiintificaDTO.getValue()); // Delete
+			// this
 			mapOfDomactResults.put(entry.getKey(), (entry.getValue().entrySet().stream()
 					.map(entryElem -> entryElem.getValue()).reduce(0.0, (d1, d2) -> d1 + d2)));
 		});
 		httpSession.setAttribute("mapOfDomactResults", mapOfDomactResults);
 		httpSession.setAttribute("mapOfCriteriaResults", mapOfCriteriaResults);
-
+		Map<Criteria, List<InsertedVariableDTO>> mapOfCriteriaVars = new HashMap<>();
+		mapOfFormulaVars.entrySet().forEach(entry -> {
+			mapOfCriteriaVars.put(
+					entry.getKey().getCriteriaFormulas().stream().map(crForm -> crForm.getCriteria()).findAny()
+							.orElse(null),
+					entry.getValue().stream().flatMap(list -> list.stream()).collect(Collectors.toList()));
+		});
+		httpSession.setAttribute("mapOfCriteriaVars", mapOfCriteriaVars);
 		return "redirect:/CriteriaEvaluationResult";
 
 	}
@@ -1035,8 +1042,9 @@ public class CriteriaController {
 		Map<Domact, Map<Criteria, Double>> mapOfCriteriaResults = (Map<Domact, Map<Criteria, Double>>) httpSession
 				.getAttribute("mapOfCriteriaResults");
 		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
-
-		if (mapOfCriteriaResults == null || mapOfDomactResults == null)
+		Map<Criteria, List<List<InsertedVariableDTO>>> mapOfCriteriaVars = (Map<Criteria, List<List<InsertedVariableDTO>>>) httpSession
+				.getAttribute("mapOfCriteriaVars");
+		if (mapOfCriteriaResults == null || mapOfDomactResults == null || mapOfCriteriaVars == null)
 			return "redirect:/CriteriaSelectionForInsert";
 		if (normaStiintificaDTO == null)
 			return "redirect:/insertNormaStiintifica";
@@ -1050,10 +1058,10 @@ public class CriteriaController {
 
 		sortedMapOfCriteriaResults.putAll(mapOfCriteriaResults);
 
-		model.addAttribute("mapOfCriteriaResults", mapOfCriteriaResults);
-		model.addAttribute("mapOfDomactResults", mapOfDomactResults);
+		model.addAttribute("mapOfCriteriaResults", sortedMapOfCriteriaResults);
+		model.addAttribute("mapOfDomactResults", sortedMapOfDomactResults);
 		model.addAttribute("normaStiintificaDTO", normaStiintificaDTO);
-
+		model.addAttribute("mapOfCriteriaVars", mapOfCriteriaVars);
 		Map<Domact, Calification> domactCalificationResult = new HashMap<>();
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Employee employee = employeeService.findByLogin(authentication.getName());
@@ -1061,24 +1069,24 @@ public class CriteriaController {
 
 		sortedMapOfDomactResults.entrySet().forEach(entry -> {
 
-			domactCalificationResult.put(entry.getKey(),
-					dPCs.stream().filter(dpc -> dpc.getDomact().getDomact_id() == entry.getKey().getDomact_id())
-							.map(dpc -> dpc.getCalification())
-							.filter(calif -> calif.getLeft_bound() <= (entry.getValue() / normaStiintificaDTO.getValue())
-									&& (entry.getValue() / normaStiintificaDTO.getValue()) <= calif.getRight_bound())
-							.findAny().orElse(null));
+			domactCalificationResult.put(entry.getKey(), dPCs.stream()
+					.filter(dpc -> dpc.getDomact().getDomact_id() == entry.getKey().getDomact_id())
+					.map(dpc -> dpc.getCalification())
+					.filter(calif -> calif.getLeft_bound() <= (entry.getValue() / normaStiintificaDTO.getValue())
+							&& (entry.getValue() / normaStiintificaDTO.getValue()) <= calif.getRight_bound())
+					.findAny().orElse(null));
 
 		});
-		
+
 		model.addAttribute("domactCalificationResult", domactCalificationResult);
 
 		Document document = new Document();
-		domactCalificationResult.entrySet().forEach(entry->{
+		domactCalificationResult.entrySet().forEach(entry -> {
 			generationService.addTable(document, mapOfCriteriaResults.get(entry.getKey()));
 			document.addSection().addParagraph().appendText("\n");
 		});
 		document.saveToFile(employee.getLogin() + "ResultsTest.docx", FileFormat.Docx);
-		
+
 		return "/CriteriaPages/CriteriaResult";
 	}
 

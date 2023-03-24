@@ -74,7 +74,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		
 		String encodedPassword = encoder.encode(dto.getPassword());
 		
-		Employee employee = new Employee(0, dto.getName(), dto.getSurname(), dto.getLogin(), encodedPassword, dto.getPosition(), roles, insertedVariables, calculatedDomacts);
+		Employee employee = new Employee(0, dto.getName(), dto.getSurname(), dto.getLogin(), encodedPassword, dto.getPosition(),dto.getDepartment(), roles, insertedVariables, calculatedDomacts);
 		
 		Employee savedEmployee = employeeRepository.save(employee);
 		userRoleService.assignEmployeeRole(savedEmployee.getEmployee_id(), 1); // 1 - User role, 2 - Admin role

@@ -23,7 +23,7 @@ public class Department {
 	private String name;
 
 	@OneToMany(mappedBy = "department")
-	private Set<Position> positions;
+	private Set<Employee> employees;
 
 	public int getDepartment_id() {
 		return department_id;
@@ -40,20 +40,22 @@ public class Department {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	
 
-	public Set<Position> getPositions() {
-		return positions;
-	}
-
-	public void setPositions(Set<Position> positions) {
-		this.positions = positions;
-	}
-
-	public Department(int department_id, String name, Set<Position> positions) {
+	public Department(int department_id, String name, Set<Employee> employees) {
 		super();
 		this.department_id = department_id;
 		this.name = name;
-		this.positions = positions;
+		this.employees = employees;
+	}
+
+	public Set<Employee> getEmployees() {
+		return employees;
+	}
+
+	public void setEmployees(Set<Employee> employees) {
+		this.employees = employees;
 	}
 
 	public Department() {

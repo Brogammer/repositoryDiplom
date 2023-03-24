@@ -1,5 +1,6 @@
 package kurswork.remaster.KursWorkKpiApp.model;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -27,7 +28,7 @@ public class Subgroup {
 	@JoinColumn(name = "domact_id", nullable = false)
 	private Domact domact;
 	@OneToMany(mappedBy = "subgroup",fetch = FetchType.EAGER)
-	private Set<Criteria> criterias;
+	private List<Criteria> criterias;
 	public int getSubgroup_id() {
 		return subgroup_id;
 	}
@@ -46,13 +47,13 @@ public class Subgroup {
 	public void setDomact(Domact domact) {
 		this.domact = domact;
 	}
-	public Set<Criteria> getCriterias() {
+	public List<Criteria> getCriterias() {
 		return criterias;
 	}
-	public void setCriterias(Set<Criteria> criterias) {
+	public void setCriterias(List<Criteria> criterias) {
 		this.criterias = criterias;
 	}
-	public Subgroup(int subgroup_id, String subgroup_name, Domact domact, Set<Criteria> criterias) {
+	public Subgroup(int subgroup_id, String subgroup_name, Domact domact, List<Criteria> criterias) {
 		super();
 		this.subgroup_id = subgroup_id;
 		this.subgroup_name = subgroup_name;

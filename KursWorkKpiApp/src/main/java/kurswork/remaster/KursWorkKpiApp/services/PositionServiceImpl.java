@@ -30,20 +30,12 @@ public class PositionServiceImpl implements PositionService{
 		return positionRepository.findById(id).orElse(null);
 	}
 
-	@Override
-	public List<Position> findAllByDepartmentId(int id) {
-		// TODO Auto-generated method stub
-		
-		return departmentService.findById(id)
-				.getPositions()
-				.stream()
-				.collect(Collectors.toList());
-	}
+	
 
 	@Override
 	public Position save(PositionRegistrationDTO dto) {
 		// TODO Auto-generated method stub
-		Position position = new Position(0, dto.getName(), null, dto.getDepartment(), null);
+		Position position = new Position(0, dto.getName(), null,  null);
 		return positionRepository.save(position);
 	}
 

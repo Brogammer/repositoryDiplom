@@ -38,11 +38,12 @@
 	<!-- Create HTML registration form -->
 	<div class="container">
 		<div class="row">
-			<div class="col-md-6 col-md-offset-3" th:each = "domactResultEntry : ${mapOfDomactResults.entrySet()}">
+			<div class="col-md-6 col-md-offset-3"
+				th:each="domactResultEntry : ${mapOfDomactResults.entrySet()}">
 				<!-- success message -->
-				<h1 th:text = "${domactResultEntry.getKey().getDomact_name()}"></h1>
+				<h1 th:text="${domactResultEntry.getKey().getDomact_name()}"></h1>
 				<table class="table table-image">
-					<thead >
+					<thead>
 						<tr>
 							<th scope="col">Indicateor</th>
 							<th scope="col">Indicator Name</th>
@@ -51,25 +52,46 @@
 
 					</thead>
 					<tbody>
-						<tr th:each = "criteriaResultEntry : ${mapOfCriteriaResults.get(domactResultEntry.getKey()).entrySet()}">
-							<td th:text = "${criteriaResultEntry.getKey().getCriteria_name()}"></td>
-							<td th:text = "${criteriaResultEntry.getKey().getCriteria_descr()}"></td>
-							<td th:text = "${criteriaResultEntry.getValue()}"></td>
+						<tr
+							th:each="criteriaResultEntry : ${mapOfCriteriaResults.get(domactResultEntry.getKey()).entrySet()}">
+							<td th:text="${criteriaResultEntry.getKey().getCriteria_name()}"></td>
+							<td>
+								<p th:text="${criteriaResultEntry.getKey().getCriteria_descr()}"></p>
+								<br>
+
+
+								<div th:each="insertedValuesDTO : ${mapOfCriteriaVars.get(criteriaResultEntry.getKey())}">
+									<p th:if="${insertedValuesDTO.getIndex() == null}"
+										th:text="${insertedValuesDTO.getVariable().getVariable_sign() + ': ' + insertedValuesDTO.getVariable().getVariable_descr()}"></p>
+									<p th:if="${insertedValuesDTO.getIndex() != null}"
+										th:text="${insertedValuesDTO.getVariable().getVariable_sign() + '' +insertedValuesDTO.getIndex() + '' + ': ' + insertedValuesDTO.getVariable().getVariable_descr()}"></p>
+									<br>
+									<p
+										th:text="${'Inserted value :' + insertedValuesDTO.getInserted_value()}"></p>
+									<br>
+									<p th:text="${'Comment :' + insertedValuesDTO.getComment()}"></p>
+								</div>
+
+
+							</td>
+							<td th:text="${criteriaResultEntry.getValue()}"></td>
 						</tr>
 						<tr>
 							<td></td>
 							<td></td>
-							<td th:text = "${domactResultEntry.getValue()}"></td>
+							<td th:text="${domactResultEntry.getValue()}"></td>
 						</tr>
 						<tr>
 							<td></td>
 							<td></td>
-							<td th:text = "${domactResultEntry.getValue() / normaStiintificaDTO.getValue()}"></td>
+							<td
+								th:text="${domactResultEntry.getValue() / normaStiintificaDTO.getValue()}"></td>
 						</tr>
 						<tr>
 							<td></td>
 							<td></td>
-							<td th:text = "${domactCalificationResult.get(domactResultEntry.getKey()).getCalificat_symbol()}"></td>
+							<td
+								th:text="${domactCalificationResult.get(domactResultEntry.getKey()).getCalificat_symbol()}"></td>
 						</tr>
 					</tbody>
 				</table>

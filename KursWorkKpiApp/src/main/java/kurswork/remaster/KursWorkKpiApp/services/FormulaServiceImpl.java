@@ -100,8 +100,9 @@ public class FormulaServiceImpl implements FormulaService {
 
 				formulaStr = formulaStr.replaceAll(multipleVariables.get(i).get(0).getVariable().getVariable_sign(),
 						"par(i + (" + step + " * " + i + "))");
+				formulaStr = formulaStr.replaceAll(variableNameForCount, "[npar]/" + multipleVariables.size());
 			}
-			formulaStr = formulaStr.replaceAll("n", "[npar]/" + multipleVariables.size());
+			
 
 			List<Double> params = new ArrayList<>();
 			multipleVariables.stream().forEach(valuesList -> {

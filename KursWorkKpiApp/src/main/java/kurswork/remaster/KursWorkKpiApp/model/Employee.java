@@ -35,6 +35,9 @@ public class Employee {
 	@ManyToOne
 	@JoinColumn(name = "position_id", nullable = false)
 	private Position position;
+	@ManyToOne
+	@JoinColumn(name = "department_id", nullable = false)
+	private Department department;
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
 	@JoinTable(
 			name = "employee_role",
@@ -127,8 +130,10 @@ public class Employee {
 
 	
 
+
 	public Employee(int employee_id, String name, String surname, String login, String password, Position position,
-			Set<UserRole> userRoles, Set<InsertedVariable> insertedVariables, Set<CalculatedDomact> calculatedDomacts) {
+			Department department, Set<UserRole> userRoles, Set<InsertedVariable> insertedVariables,
+			Set<CalculatedDomact> calculatedDomacts) {
 		super();
 		this.employee_id = employee_id;
 		this.name = name;
@@ -136,10 +141,18 @@ public class Employee {
 		this.login = login;
 		this.password = password;
 		this.position = position;
+		this.department = department;
 		this.userRoles = userRoles;
 		this.insertedVariables = insertedVariables;
 		this.calculatedDomacts = calculatedDomacts;
-		
+	}
+
+	public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
 	}
 
 	public Employee() {
