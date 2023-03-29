@@ -58,6 +58,7 @@ public class InsertedVariableDTO {
 		this.inserted_value = inserted_value;
 		this.employee = employee;
 		this.variable = variable;
+		this.comment = comment;
 		this.index = null;
 	}
 	public InsertedVariableDTO(Date datetime, String inserted_value, Employee employee, Variable variable, String comment, String index) {
@@ -66,6 +67,7 @@ public class InsertedVariableDTO {
 		this.inserted_value = inserted_value;
 		this.employee = employee;
 		this.variable = variable;
+		this.comment = comment;
 		this.index = index;
 	}
 	public InsertedVariableDTO() {

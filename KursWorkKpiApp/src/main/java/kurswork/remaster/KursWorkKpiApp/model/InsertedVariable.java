@@ -31,7 +31,15 @@ public class InsertedVariable {
 	
 	@Column(name = "comment", nullable = true, length = 2000)
 	private String comment;
+	@Column(name = "index", nullable = true, length = 2000)
+	private String index;
 	
+	public String getIndex() {
+		return index;
+	}
+	public void setIndex(String index) {
+		this.index = index;
+	}
 	public int getInsVar_id() {
 		return insVar_id;
 	}
@@ -70,7 +78,7 @@ public class InsertedVariable {
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-	public InsertedVariable(int insVar_id, Date datetime, String inserted_value, Employee employee, Variable variable, String comment) {
+	public InsertedVariable(int insVar_id, Date datetime, String inserted_value, Employee employee, Variable variable, String comment, String index) {
 		super();
 		this.insVar_id = insVar_id;
 		this.datetime = datetime;
@@ -78,6 +86,7 @@ public class InsertedVariable {
 		this.employee = employee;
 		this.variable = variable;
 		this.comment = comment;
+		this.index = index;
 	}
 	public InsertedVariable() {
 		super();

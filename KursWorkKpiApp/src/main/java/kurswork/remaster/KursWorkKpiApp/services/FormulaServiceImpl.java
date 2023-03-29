@@ -48,7 +48,7 @@ public class FormulaServiceImpl implements FormulaService {
 //		System.out.println(expression.calculate());
 //		System.out.println("Ball : " + expression1.calculate());
 
-		System.out.println("Formula :\n\t" + formula.getFormula_string());
+		//System.out.println("Formula :\n\t" + formula.getFormula_string());
 //		System.out.println("Variables :\n");
 
 		List<Variable> variables = formula.getFormulaVariables().stream()
@@ -67,7 +67,7 @@ public class FormulaServiceImpl implements FormulaService {
 
 		for (int i = 0; i < insertedVariablesOfEmployye.size(); i++) {
 			if (insertedVariablesOfEmployye.get(i).size() == 0) {
-				System.out.println("hello bitches");
+				//System.out.println("hello bitches");
 				return 0;
 			}
 		}
@@ -125,7 +125,7 @@ public class FormulaServiceImpl implements FormulaService {
 
 		}
 
-		System.out.println(formulaStr);
+		//System.out.println(formulaStr);
 
 		Expression expression = new Expression(functionStr + "", function);
 		double result = expression.calculate();

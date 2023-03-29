@@ -1,6 +1,7 @@
 package kurswork.remaster.KursWorkKpiApp.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,13 +11,11 @@ import kurswork.remaster.KursWorkKpiApp.model.Domact;
 import kurswork.remaster.KursWorkKpiApp.repositories.DomactRepository;
 
 @Service
-public class DomactServiceImpl implements DomactService{
+public class DomactServiceImpl implements DomactService {
 
-	
-	
 	@Autowired
 	DomactRepository domactRepository;
-	
+
 	@Override
 	public Domact findById(int id) {
 		// TODO Auto-generated method stub
@@ -26,7 +25,7 @@ public class DomactServiceImpl implements DomactService{
 	@Override
 	public List<Domact> findAll() {
 		// TODO Auto-generated method stub
-		return domactRepository.findAll();
+		return domactRepository.findAll().stream().distinct().collect(Collectors.toList());
 	}
 
 	@Override

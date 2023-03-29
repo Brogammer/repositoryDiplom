@@ -1,6 +1,5 @@
 package kurswork.remaster.KursWorkKpiApp.config;
 
-
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -24,57 +23,42 @@ import kurswork.remaster.KursWorkKpiApp.services.EmployeeService;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-	
-
 	@Autowired
 	private EmployeeService employeeService;
-	
-	
+
 	@Bean
-	public BCryptPasswordEncoder passwordEncoder () {
+	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	@Bean 
+
+	@Bean
 	public DaoAuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider auth = new DaoAuthenticationProvider();
 		auth.setUserDetailsService(employeeService);
 		auth.setPasswordEncoder(passwordEncoder());
 		return auth;
 	}
+
 	@Override
-	protected void configure (AuthenticationManagerBuilder auth) throws Exception {
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(authenticationProvider());
 	}
-	
-	
+
 	@Override
-	protected void configure (HttpSecurity http) throws Exception {
-		http
-		.authorizeRequests()
-		.antMatchers("/EmployeeRegistration**",
-				"/img/**", "/DepartmentSelection**")
-		.permitAll()
-		.and()
-		.authorizeRequests()
-		.antMatchers("/Test").hasAnyRole("ADMIN","USER","MANAGERICS")
-		.antMatchers("/UserPage").hasAnyRole("USER")
-		.antMatchers("/AdminPage","/FormulaCreation","/DepartmentRegistration", "/PositionRegistration", "/DepartmentSelection",
-				"/DomactRegistration","/SubgroupList").hasAnyRole("ADMIN")
-		.antMatchers("/ManagerPage").hasAnyRole("MANAGERICS")
-		.anyRequest()
-		.authenticated()
-		.and().formLogin().loginPage("/EmployeeLogin")
-		.permitAll()
-		.and()
-		.logout()
-		.invalidateHttpSession(true)
-		.clearAuthentication(true)
-		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-		.logoutSuccessUrl("/EmployeeLogin?logout").permitAll();
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests().antMatchers("/EmployeeRegistration**", "/img/**", "/DepartmentSelection**").permitAll()
+				.and().authorizeRequests()
+				.antMatchers("/Test", "/CriteriaSelectionForInsert", "/insertDate", "/insertNormaStiintifica",
+						"/VariablesListOfCriteria", "/InsertVariable", "/CloseVariableList",
+						"/NextVariablesListOfCriteria", "/DeleteCriteriaValues", "/InsertMultVariable",
+						"/CriteriaEvaluationResult", "/selectDate")
+				.hasAnyRole("ADMIN", "USER", "MANAGERICS").antMatchers("/UserPage").hasAnyRole("USER")
+				.antMatchers("/AdminPage", "/FormulaCreation", "/DepartmentRegistration", "/PositionRegistration",
+						"/DepartmentSelection", "/DomactRegistration", "/SubgroupList")
+				.hasAnyRole("ADMIN").antMatchers("/ManagerPage").hasAnyRole("MANAGERICS").anyRequest().authenticated()
+				.and().formLogin().loginPage("/EmployeeLogin").permitAll().and().logout().invalidateHttpSession(true)
+				.clearAuthentication(true).logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+				.logoutSuccessUrl("/EmployeeLogin?logout").permitAll();
 	}
-	
-	
-	
-	
-	
+
 }

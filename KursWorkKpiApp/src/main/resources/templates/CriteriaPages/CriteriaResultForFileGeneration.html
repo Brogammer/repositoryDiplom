@@ -17,6 +17,17 @@
 	width: 500px;
 }
 
+
+.firstColumn{
+	width: 7%;
+	font-weight: bold;
+}
+
+.thirdColumn{
+	width: 10%;
+}
+
+
 @media ( max-width :640px) {
 	.domActTableCol {
 		height: 120px;
@@ -48,10 +59,7 @@
 	<br>
 	<!-- Create HTML registration form -->
 	<div class="container" style="padding-top: 50px">
-		<div th:if="${isItUpdate}">
-			<p style="color: red; font-size: 50px">ATTENTION YOU ARE CHANGE
-				DATA ALREADY INSERTED</p>
-		</div>
+
 		<div class="row">
 			<table class="table table-bordered">
 				<tr class=row>
@@ -110,9 +118,9 @@
 
 		</div>
 		<div class="form-group">
-			<form th:action="@{/CriteriaEvaluationResult}" th:method="post">
+			<form th:action="@{/}" th:method="post">
 
-				<a th:href="@{/CriteriaSelectionForInsert}" class="btn btn-success">Back</a>
+				<a th:href="@{/}" class="btn btn-success">Back</a>
 				<button type="submit" class="btn btn-success">Submit</button>
 			</form>
 		</div>
@@ -121,53 +129,76 @@
 				<!-- success message -->
 				<h1 th:text="${domactResultEntry.getKey().getDomact_name()}"></h1>
 				<table class="table table-bordered">
-					<thead>
-						<tr>
-							<th scope="col">Indicatori</th>
-							<th scope="col">Indicator Name</th>
-							<th scope="col">Punctaj</th>
-						</tr>
 
-					</thead>
-					<tbody>
-						<tr
-							th:each="criteriaResultEntry : ${mapOfCriteriaResults.get(domactResultEntry.getKey()).entrySet()}">
-							<td th:text="${criteriaResultEntry.getKey().getCriteria_name()}"></td>
-							<td>
-								<p th:text="${criteriaResultEntry.getKey().getCriteria_descr()}"></p>
-								<br>
+					<tr>
+						<td>
+							<table class="table table-bordered">
+								<tr>
+									<th scope="col" class="firstColumn">Indicatori</th>
+									<th scope="col">Indicator Name</th>
+									<th scope="col" class = "thirdColumn">Punctaj</th>
+								</tr>
+							</table>
+						</td>
 
-
-								<div
-									th:each="insertedValuesDTO : ${mapOfCriteriaVars.get(criteriaResultEntry.getKey())}">
-									<p th:if="${insertedValuesDTO.getIndex() == null}"
-										th:text="${insertedValuesDTO.getVariable().getVariable_sign() + ': ' + insertedValuesDTO.getVariable().getVariable_descr()}"></p>
-									<p th:if="${insertedValuesDTO.getIndex() != null}"
-										th:text="${insertedValuesDTO.getVariable().getVariable_sign() + '' +insertedValuesDTO.getIndex() + '' + ': ' + insertedValuesDTO.getVariable().getVariable_descr()}"></p>
-									<br>
-									<p
-										th:text="${'Inserted value :' + insertedValuesDTO.getInserted_value()}"></p>
-									<br>
-									<p th:text="${'Comment :' + insertedValuesDTO.getComment()}"></p>
-								</div>
+					</tr>
+					<tr>
+						<td>
+							<table class="table table-bordered"
+								th:each="subgroup : ${mapOfDomactSubgroups.get(domactResultEntry.getKey())}">
+								<tr>
+									<td colspan="3" th:text="${subgroup.getSubgroup_name()}" style="font-weight: bold;"></td>
+								</tr>
+								<tr th:each="criteria : ${mapOfSubGroupCriteria.get(subgroup)}">
+									<td align="center" th:text="${criteria.getCriteria_name()}" class="firstColumn"></td>
+									<td>
+										<p
+											th:text="${criteria.getCriteria_descr()}"></p>
+										<br>
 
 
-							</td>
-							<td th:text="${criteriaResultEntry.getValue()}"></td>
-						</tr>
-						<tr>
-							<td></td>
-							<td align="right"><b>Suma puncte</b></td>
-							<td th:text="${domactResultEntry.getValue()}"></td>
-						</tr>
-						<tr>
-							<td></td>
-							<td align="right"><b>Total puncte</b></td>
-							<td
-								th:text="${domactResultEntry.getValue() / normaStiintificaDTO.getValue()}"></td>
-						</tr>
+										<div
+											th:each="insertedValuesDTO : ${mapOfCriteriaVars.get(criteria)}">
+											<p th:if="${insertedValuesDTO.getIndex() == null}"
+												th:text="${insertedValuesDTO.getVariable().getVariable_sign() + ': ' + insertedValuesDTO.getVariable().getVariable_descr()}"></p>
+											<p th:if="${insertedValuesDTO.getIndex() != null}"
+												th:text="${insertedValuesDTO.getVariable().getVariable_sign() + '' +insertedValuesDTO.getIndex() + '' + ': ' + insertedValuesDTO.getVariable().getVariable_descr()}"></p>
+											<br>
+											<p
+												th:text="${'Inserted value :' + insertedValuesDTO.getInserted_value()}"></p>
+											<br>
+											<p th:text="${'Comment :' + insertedValuesDTO.getComment()}"></p>
+										</div>
 
-					</tbody>
+
+									</td>
+									<td th:text="${mapOfCriteriaResults.get(criteria)}" class = "thirdColumn"></td>
+
+								</tr>
+							</table>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td>
+							<table class="table table-bordered">
+								<tr>
+
+									<td align="right"><b>Suma puncte</b></td>
+									<td
+										th:text="${domactResultEntry.getValue() * normaStiintificaDTO.getValue()}"></td>
+								</tr>
+								<tr>
+
+									<td align="right"><b>Total puncte</b></td>
+									<td th:text="${domactResultEntry.getValue()}"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+
+
 				</table>
 
 			</div>

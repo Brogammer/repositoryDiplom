@@ -51,7 +51,7 @@ public class Employee {
 	private Set<InsertedVariable> insertedVariables;
 	
 
-	@OneToMany(mappedBy = "employee")
+	@OneToMany(mappedBy = "employee", fetch = FetchType.EAGER)
 	private Set<CalculatedDomact> calculatedDomacts;
 
 	

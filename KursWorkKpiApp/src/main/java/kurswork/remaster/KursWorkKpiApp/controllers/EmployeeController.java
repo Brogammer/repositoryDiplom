@@ -2,6 +2,7 @@ package kurswork.remaster.KursWorkKpiApp.controllers;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,7 +55,19 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/")
-	public String getRedirect() {
+	public String getRedirect(HttpSession httpSession) {
+
+		Iterator<String> iterator = httpSession.getAttributeNames().asIterator();
+		for (; iterator.hasNext();) {
+			String attrName = iterator.next();
+
+			if (attrName.equals("SPRING_SECURITY_CONTEXT") || attrName.contains("CSRF_TOKEN"))
+				continue;
+			//System.out.println(attrName);
+
+			httpSession.removeAttribute(attrName);
+		}
+
 		return "redirect:/Test";
 	}
 
@@ -137,7 +150,6 @@ public class EmployeeController {
 //		List<Subgroup> insertedSubgroups = insertedCriterias.stream().map(insCriteria -> insCriteria.getSubgroup())
 //				.distinct().collect(Collectors.toList());
 
-		
 		return "/RegistrationAndLogin/Test";
 	}
 

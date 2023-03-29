@@ -24,7 +24,7 @@ public class Domact {
 
 	@OneToMany(mappedBy = "domact")
 	private Set<DomactPositionCalif> DPCs;
-	@OneToMany(mappedBy = "domact",fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "domact")
 	private List<Subgroup> Subgroups;
 	
 	@OneToMany(mappedBy = "domact")

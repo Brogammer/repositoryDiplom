@@ -19,13 +19,16 @@ public class CalculatedDomact {
 	private int calcdomact_id;
 	
 	@Column(name = "domact_calc_datetime", nullable = false)
-	private Date domactCalcDatetaime; 
+	private Date domactCalcDate; 
 	
 	@Column(name = "calculated_value", nullable = false)
 	private double calculated_value;
 	
 	@Column(name = "calculated_calificat", nullable = false)
 	private String calculated_calificat;
+	
+	@Column(name = "norma_stiint_didact", nullable = false)
+	private Double normaStiintifica;
 	
 	@ManyToOne
 	@JoinColumn(name = "employee_id", nullable = false)
@@ -43,12 +46,12 @@ public class CalculatedDomact {
 		this.calcdomact_id = calcdomact_id;
 	}
 
-	public Date getDomactCalcDatetaime() {
-		return domactCalcDatetaime;
+	public Date getDomactCalcDate() {
+		return domactCalcDate;
 	}
 
-	public void setDomactCalcDatetaime(Date domactCalcDatetaime) {
-		this.domactCalcDatetaime = domactCalcDatetaime;
+	public void setDomactCalcDate(Date domactCalcDatetaime) {
+		this.domactCalcDate = domactCalcDatetaime;
 	}
 
 	public double getCalculated_value() {
@@ -83,13 +86,24 @@ public class CalculatedDomact {
 		this.domact = domact;
 	}
 
-	public CalculatedDomact(int calcdomact_id, Date domactCalcDatetaime, double calculated_value,
-			String calculated_calificat, Employee employee, Domact domact) {
+	
+
+	public Double getNormaStiintifica() {
+		return normaStiintifica;
+	}
+
+	public void setNormaStiintifica(Double normaStiintifica) {
+		this.normaStiintifica = normaStiintifica;
+	}
+
+	public CalculatedDomact(int calcdomact_id, Date domactCalcDate, double calculated_value,
+			String calculated_calificat, Double normaStiintifica, Employee employee, Domact domact) {
 		super();
 		this.calcdomact_id = calcdomact_id;
-		this.domactCalcDatetaime = domactCalcDatetaime;
+		this.domactCalcDate = domactCalcDate;
 		this.calculated_value = calculated_value;
 		this.calculated_calificat = calculated_calificat;
+		this.normaStiintifica = normaStiintifica;
 		this.employee = employee;
 		this.domact = domact;
 	}
