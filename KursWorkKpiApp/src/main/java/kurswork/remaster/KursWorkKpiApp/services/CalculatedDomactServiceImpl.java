@@ -54,9 +54,28 @@ public class CalculatedDomactServiceImpl implements CalculatedDomactService {
 	}
 
 	@Override
+	public List<CalculatedDomact> findAllByDate(java.util.Date date) {
+
+		return calculatedDomactRepository.findAll().stream()
+				.filter(calcDom -> calcDom.getDomactCalcDate().getYear() == date.getYear()
+						&& calcDom.getDomactCalcDate().getMonth() == date.getMonth()
+						&& calcDom.getDomactCalcDate().getDay() == date.getDay())
+				.distinct().collect(Collectors.toList());
+	}
+
+	@Override
 	public List<CalculatedDomact> findAll() {
 
 		return calculatedDomactRepository.findAll().stream().distinct().collect(Collectors.toList());
+	}
+
+	@Override
+	public List<CalculatedDomact> deleteAllByYear(Date date) {
+		List<CalculatedDomact> deletedCalcDomacts = findAll().stream()
+				.filter(calcDom -> calcDom.getDomactCalcDate().getYear() < date.getYear()).collect(Collectors.toList());
+		deletedCalcDomacts.stream()
+				.forEach(calcDom -> calculatedDomactRepository.deleteById(calcDom.getCalcdomact_id()));
+		return deletedCalcDomacts;
 	}
 
 }

@@ -32,6 +32,7 @@ import kurswork.remaster.KursWorkKpiApp.model.Position;
 import kurswork.remaster.KursWorkKpiApp.model.Subgroup;
 import kurswork.remaster.KursWorkKpiApp.model.Variable;
 import kurswork.remaster.KursWorkKpiApp.services.CriteriaService;
+import kurswork.remaster.KursWorkKpiApp.services.DataCleaningService;
 import kurswork.remaster.KursWorkKpiApp.services.EmployeeService;
 import kurswork.remaster.KursWorkKpiApp.services.FormulaService;
 import kurswork.remaster.KursWorkKpiApp.services.PositionService;
@@ -47,6 +48,8 @@ public class EmployeeController {
 	PositionService positionService;
 	@Autowired
 	CriteriaService criteriaService;
+	@Autowired
+	DataCleaningService dataCleaningService;
 
 	@GetMapping("/EmployeeLogin")
 	public String getLoginPage() {
@@ -67,7 +70,7 @@ public class EmployeeController {
 
 			httpSession.removeAttribute(attrName);
 		}
-
+		
 		return "redirect:/Test";
 	}
 
@@ -150,6 +153,7 @@ public class EmployeeController {
 //		List<Subgroup> insertedSubgroups = insertedCriterias.stream().map(insCriteria -> insCriteria.getSubgroup())
 //				.distinct().collect(Collectors.toList());
 
+		
 		return "/RegistrationAndLogin/Test";
 	}
 

@@ -43,7 +43,7 @@
 				<div class="form-group">
 					<br> <br> <br>
 
-					<form th:action="@{/selectEmployee}" th:method="post" th:object="${emptyCalcDomForDate}">
+					<form th:action="@{${PostUrl}}" th:method="post" th:object="${emptyCalcDomForDate}">
 						 <br> <br> <br>
 
 						<div th:if="${employees != null}">

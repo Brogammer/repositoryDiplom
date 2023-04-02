@@ -98,7 +98,7 @@
 							</tr>
 							<tr class=row>
 								<td
-									th:text="${domactResultEntry.getValue() / normaStiintificaDTO.getValue()}"></td>
+									th:text="${domactResultEntry.getValue()}"></td>
 								<td
 									th:text="${domactCalificationResult.get(domactResultEntry.getKey()).getCalificat_symbol()}"></td>
 							</tr>
@@ -121,7 +121,7 @@
 			<form th:action="@{/}" th:method="post">
 
 				<a th:href="@{/}" class="btn btn-success">Back</a>
-				<button type="submit" class="btn btn-success">Submit</button>
+				<a th:href="@{/GenerateWordFileCriteriaResultByDate}"  class="btn btn-success" >Generate</a>
 			</form>
 		</div>
 		<div class="row" style="display: flex; flex-direction: column;">
@@ -200,7 +200,7 @@
 
 
 				</table>
-
+				
 			</div>
 		</div>
 

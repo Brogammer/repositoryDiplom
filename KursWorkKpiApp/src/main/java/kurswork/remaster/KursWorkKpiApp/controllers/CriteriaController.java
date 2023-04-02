@@ -1,5 +1,11 @@
 package kurswork.remaster.KursWorkKpiApp.controllers;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,8 +19,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,10 +36,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 
-import com.spire.doc.Document;
-import com.spire.doc.FileFormat;
-import com.spire.doc.Section;
-import com.spire.doc.Table;
 
 import kurswork.remaster.KursWorkKpiApp.dto.CalculatedDomactDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.CalificatRegistrationDTO;
@@ -58,6 +63,7 @@ import kurswork.remaster.KursWorkKpiApp.model.Variable;
 import kurswork.remaster.KursWorkKpiApp.services.CalculatedDomactService;
 import kurswork.remaster.KursWorkKpiApp.services.CriteriaFormulaService;
 import kurswork.remaster.KursWorkKpiApp.services.CriteriaService;
+import kurswork.remaster.KursWorkKpiApp.services.DataCleaningService;
 import kurswork.remaster.KursWorkKpiApp.services.DomactPosCalifService;
 import kurswork.remaster.KursWorkKpiApp.services.DomactService;
 import kurswork.remaster.KursWorkKpiApp.services.EmployeeService;
@@ -70,6 +76,9 @@ import kurswork.remaster.KursWorkKpiApp.services.VariableService;
 
 @Controller
 public class CriteriaController {
+
+	@Autowired
+	DataCleaningService dataCleaningService;
 
 	@Autowired
 	DomactPosCalifService domactPosCalifService;
@@ -1207,7 +1216,7 @@ public class CriteriaController {
 		httpSession.removeAttribute("domactCalificationResult");
 		httpSession.removeAttribute("calculatedDomactDTOForDate");
 		httpSession.removeAttribute("isItUpdate");
-
+		dataCleaningService.cleanDataExeptLastFiveYears();
 		return "redirect:/";
 	}
 
@@ -1229,7 +1238,7 @@ public class CriteriaController {
 			httpSession.setAttribute("chosenEmployee", employee);
 			return "redirect:/selectDate";
 		}
-
+		model.addAttribute("PostUrl", "/selectEmployee");
 		model.addAttribute("emptyCalcDomForDate", emptyCalcDomForDate);
 		return "/CriteriaPages/EmployeeSelection";
 	}
@@ -1262,6 +1271,7 @@ public class CriteriaController {
 		model.addAttribute("dates", dates);
 		httpSession.setAttribute("dates", dates);
 		model.addAttribute("emptyCalcDomForDate", emptyCalcDomForDate);
+		model.addAttribute("PostUrl", "/selectDate");
 
 		return "/CriteriaPages/DateAndUserSelection";
 	}
@@ -1322,7 +1332,7 @@ public class CriteriaController {
 
 //		Map<Subgroup, Map<Criteria, Double>> testmap = mapOfCriteriaResults.entrySet().stream().collect(Collectors
 //				.groupingBy(entry -> entry.getKey().getSubgroup(), Collectors.toMap(Entry::getKey, Entry::getValue)));
-		
+
 //		
 //		testmap.entrySet().forEach(entry->{
 //			System.out.println(entry.getKey().getSubgroup_name()+":");
@@ -1330,7 +1340,7 @@ public class CriteriaController {
 //				System.out.println(entry1.getKey().getCriteria_name() + " = " + entry1.getValue());
 //			});
 //		});
-		
+
 //		mapOfCriteriaResults.entrySet().forEach(entry -> System.out.println(entry.getKey().getCriteria_name() + "("
 //				+ entry.getKey().getCriteria_descr() + ") = " + entry.getValue()));
 
@@ -1358,6 +1368,7 @@ public class CriteriaController {
 		Map<Domact, Calification> domactCalificationResult = new TreeMap<Domact, Calification>(
 				(d1, d2) -> d1.getDomact_id() - d2.getDomact_id());
 		Map<Domact, Double> mapOfDomactResult = new TreeMap<>((d1, d2) -> d1.getDomact_id() - d2.getDomact_id());
+		Map<Domact, CalculatedDomact> mapOfCalculatedDomacts = new HashMap<>();
 
 		List<DomactPositionCalif> dPCs = domactPosCalifService.findByPosition(chosenEmployee.getPosition());
 		List<CalculatedDomact> calculatedDomacts = new ArrayList<>(chosenEmployee.getCalculatedDomacts());
@@ -1370,6 +1381,7 @@ public class CriteriaController {
 					if (normaStiintificaDTO.getValue() == 0)
 						normaStiintificaDTO.setValue(calcDom.getNormaStiintifica());
 					mapOfDomactResult.put(calcDom.getDomact(), calcDom.getCalculated_value());
+					mapOfCalculatedDomacts.put(calcDom.getDomact(), calcDom);
 					domactCalificationResult.put(calcDom.getDomact(),
 							dPCs.stream()
 									.filter(dpc -> dpc.getDomact().getDomact_id() == calcDom.getDomact().getDomact_id())
@@ -1390,7 +1402,9 @@ public class CriteriaController {
 		httpSession.setAttribute("mapOfCriteriaVars", mapOfCriteriaVars);
 		httpSession.setAttribute("mapOfCriteriaResults", mapOfCriteriaResults);
 		httpSession.setAttribute("chosenEmployee", chosenEmployee);
+		httpSession.setAttribute("chosenDate", chosenDate);
 		httpSession.setAttribute("mapOfDomactResult", mapOfDomactResult);
+		httpSession.setAttribute("mapOfCalculatedDomacts", mapOfCalculatedDomacts);
 		return "redirect:/CriteriaResultByDate";
 	}
 
@@ -1434,4 +1448,262 @@ public class CriteriaController {
 		return "/CriteriaPages/CriteriaResultForFileGeneration";
 	}
 
+	@SuppressWarnings("unchecked")
+	@GetMapping("/GenerateWordFileCriteriaResultByDate")
+	public void getFIleGenerationCriteriaResultByDate(Model model, HttpSession httpSession,
+			HttpServletResponse response) {
+		Map<Domact, Calification> domactCalificationResult = (Map<Domact, Calification>) httpSession
+				.getAttribute("domactCalificationResult");
+		NormaStiintificaDTO normaStiintificaDTO = (NormaStiintificaDTO) httpSession.getAttribute("normaStiintificaDTO");
+		Map<Domact, List<Subgroup>> mapOfDomactSubgroups = (Map<Domact, List<Subgroup>>) httpSession
+				.getAttribute("mapOfDomactSubgroups");
+		Map<Subgroup, List<Criteria>> mapOfSubGroupCriteria = (Map<Subgroup, List<Criteria>>) httpSession
+				.getAttribute("mapOfSubGroupCriteria");
+		Map<Criteria, List<InsertedVariableDTO>> mapOfCriteriaVars = (Map<Criteria, List<InsertedVariableDTO>>) httpSession
+				.getAttribute("mapOfCriteriaVars");
+		Map<Criteria, Double> mapOfCriteriaResults = (Map<Criteria, Double>) httpSession
+				.getAttribute("mapOfCriteriaResults");
+		Map<Domact, CalculatedDomact> mapOfCalculatedDomacts = (Map<Domact, CalculatedDomact>) httpSession
+				.getAttribute("mapOfCalculatedDomacts");
+
+		Map<Domact, Double> mapOfDomactResult = (Map<Domact, Double>) httpSession.getAttribute("mapOfDomactResult");
+		Employee employee = (Employee) httpSession.getAttribute("chosenEmployee");
+
+		if (domactCalificationResult == null || normaStiintificaDTO == null || mapOfDomactSubgroups == null
+				|| mapOfSubGroupCriteria == null || mapOfCriteriaVars == null || mapOfCriteriaResults == null
+				|| employee == null || mapOfDomactResult == null || mapOfCalculatedDomacts == null) {
+			return;
+		}
+
+		java.util.Date chosenDate = (java.util.Date) httpSession.getAttribute("chosenDate");
+		Integer intYear = Integer.parseInt(chosenDate.toString().substring(0, 4));
+		String dateRange = (intYear - 1) + "-" + intYear;
+		String dirPath = "src\\main\\resources\\static\\documents\\" + employee.getLogin() + "_" + employee.getName()
+				+ "" + employee.getSurname();
+		String fileName = "\\Evaluarea_performantei_" + dateRange + "_" + employee.getName() + ""
+				+ employee.getSurname() + ".docx";
+		File dir = new File(dirPath);
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
+		FileOutputStream fileOutputStream;
+		try {
+			fileOutputStream = new FileOutputStream(new File(dirPath + fileName));
+			XWPFDocument document = generationService.generateWordFileApachePOI(mapOfDomactSubgroups, mapOfSubGroupCriteria,
+					mapOfCriteriaResults, mapOfCriteriaVars, domactCalificationResult, mapOfCalculatedDomacts, employee);
+
+			// Сохраняется документ
+			document.write(fileOutputStream);
+			fileOutputStream.close();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+
+		File file = new File(dirPath + fileName);
+
+		response.setContentType("application/octet-stream");
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment;filename=" + file.getName();
+		response.setHeader(headerKey, headerValue);
+		try {
+			ServletOutputStream servletOutputStream = response.getOutputStream();
+			BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+
+			byte[] buffer = new byte[(int) file.length()];
+			int bytesRead = -1;
+
+			while((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+				servletOutputStream.write(buffer, 0 , bytesRead);
+			}
+			
+			servletOutputStream.close();
+			bufferedInputStream.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@GetMapping("/selectDateForAllResults")
+	public String getSelectDateForAllResults(Model model, HttpSession httpSession) {
+
+		List<java.util.Date> dates = calculatedDomactService.findAll().stream()
+				.map(calcDom -> calcDom.getDomactCalcDate()).distinct().collect(Collectors.toList());
+
+		CalculatedDomact emptyCalcDomForDate = (CalculatedDomact) httpSession.getAttribute("emptyCalcDomForDate");
+		if (emptyCalcDomForDate == null) {
+			emptyCalcDomForDate = new CalculatedDomact();
+		}
+		model.addAttribute("dates", dates);
+		httpSession.setAttribute("dates", dates);
+		model.addAttribute("emptyCalcDomForDate", emptyCalcDomForDate);
+		model.addAttribute("PostUrl", "/selectDateForAllResults");
+
+		return "/CriteriaPages/DateAndUserSelection";
+	}
+
+	@PostMapping("/selectDateForAllResults")
+	public String postSelectDateForAllResults(
+			@ModelAttribute("emptyCalcDomForDate") CalculatedDomact emptyCalcDomForDate, Model model,
+			HttpSession httpSession) {
+
+		@SuppressWarnings("unchecked")
+		List<java.util.Date> dates = (List<java.util.Date>) httpSession.getAttribute("dates");
+		java.util.Date chosenDate = dates.get(emptyCalcDomForDate.getCalcdomact_id());
+
+		httpSession.setAttribute("chosenDate", chosenDate);
+		List<CalculatedDomact> calculatedDomacts = calculatedDomactService.findAllByDate(chosenDate);
+
+		httpSession.setAttribute("calculatedDomacts", calculatedDomacts);
+
+		return "redirect:/AllCriteriaResultByDate";
+	}
+
+	@GetMapping("/AllCriteriaResultByDate")
+	public String getAllCriteriaResultByDate(Model model, HttpSession httpSession) {
+		@SuppressWarnings("unchecked")
+		List<CalculatedDomact> calculatedDomacts = (List<CalculatedDomact>) httpSession
+				.getAttribute("calculatedDomacts");
+
+		if (calculatedDomacts == null) {
+			return "redirect:/selectDateForAllResults";
+		}
+
+		Map<Employee, List<CalculatedDomact>> mapOfEmployeeCalcDomact = new TreeMap<>(
+				(emp1, emp2) -> (emp1.getPosition().getPosition_id() * emp1.getEmployee_id())
+						- (emp2.getPosition().getPosition_id() * emp2.getEmployee_id()));
+
+		mapOfEmployeeCalcDomact
+				.putAll(calculatedDomacts.stream().collect(Collectors.groupingBy(CalculatedDomact::getEmployee)));
+
+		Map<Employee, Double> mapOfEmployeesFinalResults = new HashMap<>();
+
+		mapOfEmployeeCalcDomact.entrySet().forEach(entry -> {
+
+			entry.getValue().sort((cd1, cd2) -> cd1.getDomact().getDomact_id() - cd2.getDomact().getDomact_id());
+
+			mapOfEmployeesFinalResults.put(entry.getKey(), entry.getValue().stream()
+					.map(calcDom -> domactPosCalifService.findByPosition(entry.getKey().getPosition()).stream()
+							.filter(dpc -> dpc.getDomact().getDomact_id() == calcDom.getDomact().getDomact_id())
+							.map(dpc -> dpc.getCalification())
+							.filter(calif -> calif.getLeft_bound() <= calcDom.getCalculated_value()
+									&& calcDom.getCalculated_value() <= calif.getRight_bound())
+							.findAny().orElse(null))
+					.map(calif -> calif.getCalificat_coef()).reduce(0.0, (c1, c2) -> c1 + c2)
+					/ entry.getValue().size());
+
+		});
+
+		model.addAttribute("mapOfEmployeesFinalResults", mapOfEmployeesFinalResults);
+		model.addAttribute("mapOfEmployeeCalcDomact", mapOfEmployeeCalcDomact);
+		return "/CriteriaPages/AllCriteriaResultsByDate";
+	}
+
+	@GetMapping("/selectEmployeeForFiveYearsResult")
+	public String getEmployeeSelectionForFiveYearsResult(Model model, HttpSession httpSession) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Employee employee = employeeService.findByLogin(authentication.getName());
+		List<GrantedAuthority> authorities = new ArrayList<>(authentication.getAuthorities());
+
+		CalculatedDomact emptyCalcDomForDate = new CalculatedDomact();
+		emptyCalcDomForDate.setEmployee(new Employee());
+		httpSession.setAttribute("emptyCalcDomForDate", emptyCalcDomForDate);
+		if (authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+			List<Employee> employees = employeeService.findAll();
+			model.addAttribute("employees", employees);
+			httpSession.setAttribute("employees", employees);
+		} else {
+			httpSession.setAttribute("chosenEmployee", employee);
+			return "redirect:/lastFiveYearsActivity";
+		}
+		model.addAttribute("PostUrl", "/selectEmployeeForFiveYearsResult");
+		model.addAttribute("emptyCalcDomForDate", emptyCalcDomForDate);
+		return "/CriteriaPages/EmployeeSelection";
+	}
+
+	@PostMapping("/selectEmployeeForFiveYearsResult")
+	public String postEmployeeSelectionForFiveYearsResult(
+			@ModelAttribute("emptyCalcDomForDate") CalculatedDomact emptyCalcDomForDate, HttpSession httpSession) {
+
+		@SuppressWarnings("unchecked")
+		List<Employee> employees = (List<Employee>) httpSession.getAttribute("employees");
+
+		httpSession.setAttribute("chosenEmployee", employees.get(emptyCalcDomForDate.getEmployee().getEmployee_id()));
+		return "redirect:/lastFiveYearsActivity";
+	}
+
+	@GetMapping("/lastFiveYearsActivity")
+	public String getLastFiveYaersActivity(Model model, HttpSession httpSession) {
+
+		Employee employee = (Employee) httpSession.getAttribute("chosenEmployee");
+		if (employee == null) {
+			return "redirect:/selectEmployeeForFiveYearsResult";
+		}
+
+		List<CalculatedDomact> calculatedDomacts = new ArrayList<>(employee.getCalculatedDomacts());
+
+		List<java.util.Date> dates = new ArrayList<>();
+		calculatedDomacts.stream().map(calcDom -> calcDom.getDomactCalcDate())
+				.collect(Collectors.groupingBy(date -> date.getYear())).entrySet().forEach(entry -> {
+					dates.add(entry.getValue().stream().max((d1, d2) -> d1.compareTo(d2)).get());
+				});
+		// dates.forEach(date->System.out.println(date.toString()));
+		List<java.util.Date> lastFiveYearsDates = dates.stream().sorted((d1, d2) -> d2.compareTo(d1)).limit(5)
+				.collect(Collectors.toList());
+
+		Map<Domact, Map<java.util.Date, List<CalculatedDomact>>> mapOflastFiveYearsCalcDom = calculatedDomacts.stream()
+				.collect(Collectors.groupingBy(CalculatedDomact::getDomact)).entrySet().stream()
+				.collect(Collectors.toMap(Entry::getKey,
+						entry -> entry.getValue().stream()
+								.filter(calcDom -> lastFiveYearsDates.contains(calcDom.getDomactCalcDate()))
+								.collect(Collectors.groupingBy(CalculatedDomact::getDomactCalcDate))));
+
+		Map<Domact, Map<java.util.Date, List<CalculatedDomact>>> sortedMapOfLastFiveYearsCalcDom = new TreeMap<>(
+				(d1, d2) -> d1.getDomact_id() - d2.getDomact_id());
+
+		mapOflastFiveYearsCalcDom.entrySet().forEach(entry -> {
+			Map<java.util.Date, List<CalculatedDomact>> mapOfCalcDomDates = new TreeMap<>((d1, d2) -> d2.compareTo(d1));
+			mapOfCalcDomDates.putAll(entry.getValue());
+			sortedMapOfLastFiveYearsCalcDom.put(entry.getKey(), mapOfCalcDomDates);
+		});
+//
+//		sortedMapOflastFiveYearsCalcDom.entrySet().forEach(entry -> {
+//			System.out.println(entry.getKey().getDomact_name() + ":");
+//			entry.getValue().entrySet().forEach(innerEntry -> {
+//				System.out.println("\t" + innerEntry.getKey().toString() + ":");
+//				innerEntry.getValue().forEach(calcDom -> System.out
+//						.println("\t\t" + calcDom.getCalculated_value() + " " + calcDom.getCalculated_calificat()));
+//			});
+//		});
+//
+
+		employee.getCalculatedDomacts().stream().collect(Collectors.groupingBy(calcDom -> calcDom.getDomact()));
+		Map<Domact, Double> mapOfTotalPuncte = sortedMapOfLastFiveYearsCalcDom.entrySet().stream()
+				.collect(Collectors.toMap(Entry::getKey,
+						entry -> entry.getValue().entrySet().stream().flatMap(entry1 -> entry1.getValue().stream())
+								.map(calcDom -> calcDom.getCalculated_value()).reduce(0.0, (v1, v2) -> v1 + v2)));
+//		mapOfTotalPuncte.entrySet()
+//				.forEach(entry -> System.out.println(entry.getKey().getDomact_name() + " = " + entry.getValue()));
+		Map<java.util.Date, String> mapOfYearsRange = lastFiveYearsDates.stream()
+				.collect(Collectors.toMap(date -> date, date -> Integer.parseInt(date.toString().substring(0, 4))))
+				.entrySet().stream()
+				.collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue() + " - " + (entry.getValue() - 1)));
+//		mapOfYearsRange.entrySet().forEach(entry->{
+//			System.out.println(entry.getKey().toString() +" = \"" + entry.getValue() + "\"");
+//		});
+
+		httpSession.setAttribute("mapOfYearsRange", mapOfYearsRange);
+		httpSession.setAttribute("mapOfTotalPuncte", mapOfTotalPuncte);
+		httpSession.setAttribute("sortedMapOfLastFiveYearsCalcDom", sortedMapOfLastFiveYearsCalcDom);
+		model.addAttribute("mapOfYearsRange", mapOfYearsRange);
+		model.addAttribute("mapOfTotalPuncte", mapOfTotalPuncte);
+		model.addAttribute("sortedMapOfLastFiveYearsCalcDom", sortedMapOfLastFiveYearsCalcDom);
+		model.addAttribute("employee", employee);
+
+		return "/CriteriaPages/FiveYearsDomactResult";
+	}
 }

@@ -75,4 +75,18 @@ public class InsertedVariableServiceImpl implements InsertedVariableService {
 		}
 		return null;
 	}
+
+	@Override
+	public List<InsertedVariable> findAll() {
+
+		return insertedVariableRepository.findAll();
+	}
+
+	@Override
+	public List<InsertedVariable> deleteAllByYear(Date date) {
+		List<InsertedVariable> deletedInsertedVariables = findAll().stream()
+				.filter(insVar -> insVar.getDatetime().getYear() < date.getYear()).collect(Collectors.toList());
+		deletedInsertedVariables.forEach(insVar -> insertedVariableRepository.deleteById(insVar.getInsVar_id()));
+		return deletedInsertedVariables;
+	}
 }

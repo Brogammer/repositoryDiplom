@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1" name="viewport"
+	content="width=device-width, initial-scale=1" />
+<title>Criterias Results</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+<style type="text/css">
+.domActTableCol {
+	height: 80px;
+	width: 500px;
+}
+
+.thirdRow {
+	height: 60px;
+}
+
+.container {
+	margin-left: 2%;
+	margin-right: 2%;
+	align-content: center;
+}
+
+@media ( max-width :1000px) {
+	.domActTableCol {
+		height: 120px;
+	}
+}
+</style>
+
+</head>
+
+<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" th:href="@{/}">Criteria
+					Evaluation Result for Five Years</a>
+			</div>
+		</div>
+	</nav>
+
+
+	<br>
+	<br>
+	<!-- Create HTML registration form -->
+	<div class="container" style="padding-top: 50px">
+
+		<div class="row">
+			<table class="table table-bordered">
+				<tr class=row>
+					<td align="center"><b
+						th:text="${'Cadrul didactic: ' + employee.getName() + ' ' + employee.getSurname}"></b></td>
+				</tr>
+				<tr class=row>
+					<td align="center"><b
+						th:text="${employee.getPosition().getName()}"></b>
+					</td>
+				</tr>
+			</table>
+			<div
+				th:each="domactDateCalcResEntry : ${sortedMapOfLastFiveYearsCalcDom.entrySet()}">
+				<table class="table table-bordered">
+					<tr>
+						<th>Anul universitar</th>
+						<th>Domeniile de activitate</th>
+						<th>Punctaj final</th>
+						<th>Calificativul</th>
+					</tr>
+					<tr>
+						<td align="center"
+							th:text="${domactDateCalcResEntry.getKey().getDomact_name()}"
+							colspan="4"></td>
+					</tr>
+					<tr
+						th:each="dateCalcResEntry : ${domactDateCalcResEntry.getValue().entrySet()}">
+						<td th:text="${mapOfYearsRange.get(dateCalcResEntry.getKey())}"></td>
+						<td></td>
+						<td th:each="calcRes : ${dateCalcResEntry.getValue()}">
+							<p th:text="${calcRes.getCalculated_value()}"></p>
+						</td>
+						<td th:each="calcRes : ${dateCalcResEntry.getValue()}">
+							<p th:text="${calcRes.getCalculated_calificat()}"></p>
+						</td>
+					</tr>
+					<tr style = "font-weight: bold; background-color: lightgray;" >
+						<td></td>
+						<td align="right">Total Puncte</td>
+						<td
+							th:text="${mapOfTotalPuncte.get(domactDateCalcResEntry.getKey())}"></td>
+						<td></td>
+					</tr>
+
+				</table>
+
+			</div>
+
+		</div>
+
+
+
+	</div>
+
+
+</body>
+</html>

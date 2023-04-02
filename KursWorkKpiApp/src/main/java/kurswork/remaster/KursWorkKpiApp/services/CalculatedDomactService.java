@@ -11,4 +11,6 @@ import kurswork.remaster.KursWorkKpiApp.model.CalculatedDomact;
 public interface CalculatedDomactService {
 	public CalculatedDomact save (CalculatedDomactDTO dto);
 	public List<CalculatedDomact> findAll ();
+	public List<CalculatedDomact> findAllByDate(java.util.Date date);
+	public List<CalculatedDomact> deleteAllByYear(java.util.Date date);
 }
