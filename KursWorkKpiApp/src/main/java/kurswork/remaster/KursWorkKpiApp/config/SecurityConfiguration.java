@@ -54,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 						"/CriteriaEvaluationResult", "/selectDate")
 				.hasAnyRole("ADMIN", "USER", "MANAGERICS").antMatchers("/UserPage").hasAnyRole("USER")
 				.antMatchers("/AdminPage", "/FormulaCreation", "/DepartmentRegistration", "/PositionRegistration",
-						"/DepartmentSelection", "/DomactRegistration", "/SubgroupList")
+						"/DepartmentSelection", "/DomactRegistration", "/SubgroupList","/selectDateForAllResults","/AllCriteriaResultByDate")
 				.hasAnyRole("ADMIN").antMatchers("/ManagerPage").hasAnyRole("MANAGERICS").anyRequest().authenticated()
 				.and().formLogin().loginPage("/EmployeeLogin").permitAll().and().logout().invalidateHttpSession(true)
 				.clearAuthentication(true).logoutRequestMatcher(new AntPathRequestMatcher("/logout"))

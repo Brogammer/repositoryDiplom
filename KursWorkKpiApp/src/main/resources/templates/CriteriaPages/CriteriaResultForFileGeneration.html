@@ -3,7 +3,8 @@
 <head>
 <meta charset="ISO-8859-1" name="viewport"
 	content="width=device-width, initial-scale=1" />
-<title>Criteria Registration</title>
+<title>Teza de licenta Project</title>
+
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
@@ -17,16 +18,14 @@
 	width: 500px;
 }
 
-
-.firstColumn{
+.firstColumn {
 	width: 7%;
 	font-weight: bold;
 }
 
-.thirdColumn{
+.thirdColumn {
 	width: 10%;
 }
-
 
 @media ( max-width :640px) {
 	.domActTableCol {
@@ -48,8 +47,8 @@
 						class="icon-bar"></span> <span class="icon-bar"></span> <span
 						class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#" th:href="@{/}">Criteria
-					Evaluation Result</a>
+				<a class="navbar-brand" href="#" th:href="@{/}">Main menu</a>
+
 			</div>
 		</div>
 	</nav>
@@ -97,8 +96,7 @@
 
 							</tr>
 							<tr class=row>
-								<td
-									th:text="${domactResultEntry.getValue()}"></td>
+								<td th:text="${domactResultEntry.getValue()}"></td>
 								<td
 									th:text="${domactCalificationResult.get(domactResultEntry.getKey()).getCalificat_symbol()}"></td>
 							</tr>
@@ -120,8 +118,9 @@
 		<div class="form-group">
 			<form th:action="@{/}" th:method="post">
 
-				<a th:href="@{/}" class="btn btn-success">Back</a>
-				<a th:href="@{/GenerateWordFileCriteriaResultByDate}"  class="btn btn-success" >Generate</a>
+				<a th:href="@{/}" class="btn btn-success">Back</a> <a
+					th:href="@{/GenerateWordFileCriteriaResultByDate}"
+					class="btn btn-success">Generate</a>
 			</form>
 		</div>
 		<div class="row" style="display: flex; flex-direction: column;">
@@ -136,7 +135,7 @@
 								<tr>
 									<th scope="col" class="firstColumn">Indicatori</th>
 									<th scope="col">Indicator Name</th>
-									<th scope="col" class = "thirdColumn">Punctaj</th>
+									<th scope="col" class="thirdColumn">Punctaj</th>
 								</tr>
 							</table>
 						</td>
@@ -147,14 +146,14 @@
 							<table class="table table-bordered"
 								th:each="subgroup : ${mapOfDomactSubgroups.get(domactResultEntry.getKey())}">
 								<tr>
-									<td colspan="3" th:text="${subgroup.getSubgroup_name()}" style="font-weight: bold;"></td>
+									<td colspan="3" th:text="${subgroup.getSubgroup_name()}"
+										style="font-weight: bold;"></td>
 								</tr>
 								<tr th:each="criteria : ${mapOfSubGroupCriteria.get(subgroup)}">
-									<td align="center" th:text="${criteria.getCriteria_name()}" class="firstColumn"></td>
+									<td align="center" th:text="${criteria.getCriteria_name()}"
+										class="firstColumn"></td>
 									<td>
-										<p
-											th:text="${criteria.getCriteria_descr()}"></p>
-										<br>
+										<p th:text="${criteria.getCriteria_descr()}"></p> <br>
 
 
 										<div
@@ -172,7 +171,8 @@
 
 
 									</td>
-									<td th:text="${mapOfCriteriaResults.get(criteria)}" class = "thirdColumn"></td>
+									<td th:text="${mapOfCriteriaResults.get(criteria)}"
+										class="thirdColumn"></td>
 
 								</tr>
 							</table>
@@ -200,7 +200,7 @@
 
 
 				</table>
-				
+
 			</div>
 		</div>
 

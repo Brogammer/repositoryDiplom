@@ -66,12 +66,25 @@ public class EmployeeController {
 
 			if (attrName.equals("SPRING_SECURITY_CONTEXT") || attrName.contains("CSRF_TOKEN"))
 				continue;
-			//System.out.println(attrName);
+			// System.out.println(attrName);
 
 			httpSession.removeAttribute(attrName);
 		}
-		
-		return "redirect:/Test";
+
+		return "redirect:/MainMenu";
+	}
+
+	@GetMapping("/MainMenu")
+	public String getMainMenu(HttpSession httpSession, Model model) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Employee employee = employeeService.findByLogin(authentication.getName());
+		List<String> roles = new ArrayList<>(authentication.getAuthorities()).stream().map(grA -> grA.getAuthority())
+				.collect(Collectors.toList());
+		model.addAttribute("employee", employee);
+		model.addAttribute("roles", roles);
+
+		return "/RegistrationAndLogin/MainMenu/MainMenu";
 	}
 
 	@GetMapping("/EmployeeRegistration")
@@ -153,7 +166,6 @@ public class EmployeeController {
 //		List<Subgroup> insertedSubgroups = insertedCriterias.stream().map(insCriteria -> insCriteria.getSubgroup())
 //				.distinct().collect(Collectors.toList());
 
-		
 		return "/RegistrationAndLogin/Test";
 	}
 

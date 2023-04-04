@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1" name="viewport"
+	content="width=device-width, initial-scale=1" />
+<title>Main menu</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
+<style type="text/css">
+.opportunity {
+	
+}
+
+.UserOpportunity {
+	display: flex;
+	flex-direction: column;
+}
+
+.AdminOpportunity {
+	display: flex;
+	flex-direction: column;
+}
+a{
+
+}
+.btn-success{
+	background-color: gray;
+}
+</style>
+</head>
+<body>
+
+	<!-- create navigation bar ( header) -->
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+					aria-controls="navbar">
+					<span class="sr-only"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#" th:href="@{/}">Main menu</a>
+			</div>
+		</div>
+	</nav>
+
+	<br>
+	<br>
+	<!-- Create HTML registration form -->
+	<div class="container">
+		<h1
+			th:text="${'Welcome '+ employee.getName() + ' ' + employee.getSurname() + '!'}"></h1>
+
+		<div class="opportunity">
+			<div class="UserOpportunity" th:if="${roles.contains('ROLE_USER')}">
+				<p>Here is your User opportunities:</p>
+
+				
+				
+				<a th:href="@{/CriteriaSelectionForInsert}" class="btn btn-success">Insert
+					Data for "Evaluarea Anuala"</a> <a th:href="@{/CriteriaResultByDate}"
+					class="btn btn-success">Generate Inserted "Evaluarea Anuala" </a> <a
+					th:href="@{/lastFiveYearsActivity}" class="btn btn-success"> Generate
+					"RAPORT DESPRE ACTIVITATEA DIDACTICO-STIINTIFICA PENTRU ULTIMI 5
+					ANI"</a> <a th:href="@{/EmployeeLogin?logout}" class="btn btn-success">Logout</a>
+			</div>
+			<div class="AdminOpportunity" th:if="${roles.contains('ROLE_ADMIN')}">
+				<p>Here is your Admin opportunities:</p>
+				<a th:href="@{/AllCriteriaResultByDate}" class="btn btn-success"> Generate
+					"RAPORT ANUAL DESPRE PERFORMANTA CADRELOR DIDACTICE"</a> <a
+					th:href="@{/PositionRegistration}" class="btn btn-success">Position
+					Registration</a> <a th:href="@{/DepartmentRegistration}"
+					class="btn btn-success">Department Registration</a> <a
+					th:href="@{/CalificationList}" class="btn btn-success">Calification
+					Registration</a> <a th:href="@{/DomactRegistration}"
+					class="btn btn-success">Domeniul de Activitate Registration</a> <a
+					th:href="@{/CriteriaRegistration}" class="btn btn-success">Criteria
+					Registration</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

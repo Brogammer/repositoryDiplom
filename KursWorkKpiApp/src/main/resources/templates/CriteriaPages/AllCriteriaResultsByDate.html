@@ -109,11 +109,11 @@
 						<table class="table table-bordered">
 
 							<tr class=row>
-								<td  class="domActTableCol"> Punctaj Final</td>
+								<td class="domActTableCol">Punctaj Final</td>
 							</tr>
 							<tr class=row>
 								<td><p>(1-4)</p></td>
-								
+
 
 							</tr>
 							<tr class=row>
@@ -123,13 +123,18 @@
 						</table>
 					</div>
 				</div>
-				
+
 			</div>
 
 		</div>
 
 
+		<form th:action="@{/}" th:method="post">
 
+			<a th:href="@{/selectDateForAllResults}" class="btn btn-success">Back</a> <a
+				th:href="@{/AllCriteriaResultByDateWordFileGenerate}"
+				class="btn btn-success">Generate</a>
+		</form>
 	</div>
 
 

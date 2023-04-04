@@ -52,7 +52,7 @@ public class CalificationController {
 		Position position = (Position) httpSession.getAttribute("selectedPosition");
 		Domact domact = (Domact) httpSession.getAttribute("selectedDomact");
 		if (position == null || domact == null) {
-			return "redirect:/DepartmentSelectionCalif";
+			return "redirect:/CalificationList";
 		}
 		model.addAttribute("calificationDTO", new CalificatRegistrationDTO());
 		model.addAttribute("wrongBounds", false);
@@ -112,7 +112,7 @@ public class CalificationController {
 		Position position = (Position) httpSession.getAttribute("selectedPosition");
 		Domact domact = (Domact) httpSession.getAttribute("selectedDomact");
 		if (position == null || domact == null) {
-			return "redirect:/DepartmentSelectionCalif";
+			return "redirect:/CalificationList";
 		}
 		@SuppressWarnings("unchecked")
 		List<CalificatRegistrationDTO> dtos = (List<CalificatRegistrationDTO>) httpSession.getAttribute("calificatDTOList");

@@ -3,7 +3,8 @@
 <head>
 <meta charset="ISO-8859-1" name="viewport"
 	content="width=device-width, initial-scale=1" />
-<title>Criterias Results</title>
+<title>Teza de licenta Project</title>
+
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
@@ -47,8 +48,8 @@
 						class="icon-bar"></span> <span class="icon-bar"></span> <span
 						class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#" th:href="@{/}">Criteria
-					Evaluation Result for Five Years</a>
+				<a class="navbar-brand" href="#" th:href="@{/}">Main menu</a>
+
 			</div>
 		</div>
 	</nav>
@@ -67,8 +68,7 @@
 				</tr>
 				<tr class=row>
 					<td align="center"><b
-						th:text="${employee.getPosition().getName()}"></b>
-					</td>
+						th:text="${employee.getPosition().getName()}"></b></td>
 				</tr>
 			</table>
 			<div
@@ -96,7 +96,7 @@
 							<p th:text="${calcRes.getCalculated_calificat()}"></p>
 						</td>
 					</tr>
-					<tr style = "font-weight: bold; background-color: lightgray;" >
+					<tr style="font-weight: bold; background-color: lightgray;">
 						<td></td>
 						<td align="right">Total Puncte</td>
 						<td
@@ -109,7 +109,12 @@
 			</div>
 
 		</div>
+		<form th:action="@{/}" th:method="post">
 
+			<a th:href="@{/selectEmployeeForFiveYearsResult}"
+				class="btn btn-success">Back</a> <a
+				th:href="@{/generateLastFiveResultRaport}" class="btn btn-success">Generate</a>
+		</form>
 
 
 	</div>

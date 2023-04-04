@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
-
 
 import kurswork.remaster.KursWorkKpiApp.dto.CalculatedDomactDTO;
 import kurswork.remaster.KursWorkKpiApp.dto.CalificatRegistrationDTO;
@@ -1368,7 +1368,8 @@ public class CriteriaController {
 		Map<Domact, Calification> domactCalificationResult = new TreeMap<Domact, Calification>(
 				(d1, d2) -> d1.getDomact_id() - d2.getDomact_id());
 		Map<Domact, Double> mapOfDomactResult = new TreeMap<>((d1, d2) -> d1.getDomact_id() - d2.getDomact_id());
-		Map<Domact, CalculatedDomact> mapOfCalculatedDomacts = new HashMap<>();
+		Map<Domact, CalculatedDomact> mapOfCalculatedDomacts = new TreeMap<>(
+				(d1, d2) -> d1.getDomact_id() - d2.getDomact_id());
 
 		List<DomactPositionCalif> dPCs = domactPosCalifService.findByPosition(chosenEmployee.getPosition());
 		List<CalculatedDomact> calculatedDomacts = new ArrayList<>(chosenEmployee.getCalculatedDomacts());
@@ -1435,6 +1436,7 @@ public class CriteriaController {
 		Double finalResult = domactCalificationResult.entrySet().stream()
 				.map(entry -> entry.getValue().getCalificat_coef()).reduce(0.0, (d1, d2) -> d1 + d2)
 				/ domactCalificationResult.size();
+		httpSession.setAttribute("finalResult", finalResult);
 		model.addAttribute("domactCalificationResult", domactCalificationResult);
 		model.addAttribute("normaStiintificaDTO", normaStiintificaDTO);
 		model.addAttribute("mapOfDomactSubgroups", mapOfDomactSubgroups);
@@ -1465,13 +1467,15 @@ public class CriteriaController {
 				.getAttribute("mapOfCriteriaResults");
 		Map<Domact, CalculatedDomact> mapOfCalculatedDomacts = (Map<Domact, CalculatedDomact>) httpSession
 				.getAttribute("mapOfCalculatedDomacts");
+		Double finalResult = (Double) httpSession.getAttribute("finalResult");
 
 		Map<Domact, Double> mapOfDomactResult = (Map<Domact, Double>) httpSession.getAttribute("mapOfDomactResult");
 		Employee employee = (Employee) httpSession.getAttribute("chosenEmployee");
 
 		if (domactCalificationResult == null || normaStiintificaDTO == null || mapOfDomactSubgroups == null
 				|| mapOfSubGroupCriteria == null || mapOfCriteriaVars == null || mapOfCriteriaResults == null
-				|| employee == null || mapOfDomactResult == null || mapOfCalculatedDomacts == null) {
+				|| employee == null || mapOfDomactResult == null || mapOfCalculatedDomacts == null
+				|| finalResult == null) {
 			return;
 		}
 
@@ -1489,8 +1493,9 @@ public class CriteriaController {
 		FileOutputStream fileOutputStream;
 		try {
 			fileOutputStream = new FileOutputStream(new File(dirPath + fileName));
-			XWPFDocument document = generationService.generateWordFileApachePOI(mapOfDomactSubgroups, mapOfSubGroupCriteria,
-					mapOfCriteriaResults, mapOfCriteriaVars, domactCalificationResult, mapOfCalculatedDomacts, employee);
+			XWPFDocument document = generationService.generateWordFileApachePOI(mapOfDomactSubgroups,
+					mapOfSubGroupCriteria, mapOfCriteriaResults, mapOfCriteriaVars, mapOfCalculatedDomacts, employee,
+					finalResult);
 
 			// Сохраняется документ
 			document.write(fileOutputStream);
@@ -1499,7 +1504,6 @@ public class CriteriaController {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
 
 		File file = new File(dirPath + fileName);
 
@@ -1514,10 +1518,10 @@ public class CriteriaController {
 			byte[] buffer = new byte[(int) file.length()];
 			int bytesRead = -1;
 
-			while((bytesRead = bufferedInputStream.read(buffer)) != -1) {
-				servletOutputStream.write(buffer, 0 , bytesRead);
+			while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+				servletOutputStream.write(buffer, 0, bytesRead);
 			}
-			
+
 			servletOutputStream.close();
 			bufferedInputStream.close();
 		} catch (Exception e) {
@@ -1599,7 +1603,66 @@ public class CriteriaController {
 
 		model.addAttribute("mapOfEmployeesFinalResults", mapOfEmployeesFinalResults);
 		model.addAttribute("mapOfEmployeeCalcDomact", mapOfEmployeeCalcDomact);
+		httpSession.setAttribute("mapOfEmployeesFinalResults", mapOfEmployeesFinalResults);
+		httpSession.setAttribute("mapOfEmployeeCalcDomact", mapOfEmployeeCalcDomact);
 		return "/CriteriaPages/AllCriteriaResultsByDate";
+	}
+
+	@GetMapping("/AllCriteriaResultByDateWordFileGenerate")
+	public void getAllCriteriaResultByDateWordFileGenerate(HttpSession httpSession, HttpServletResponse response) {
+		@SuppressWarnings("unchecked")
+		Map<Employee, List<CalculatedDomact>> mapOfEmployeeCalcDomact = (Map<Employee, List<CalculatedDomact>>) httpSession
+				.getAttribute("mapOfEmployeeCalcDomact");
+		@SuppressWarnings("unchecked")
+		Map<Employee, Double> mapOfEmployeesFinalResults = (Map<Employee, Double>) httpSession
+				.getAttribute("mapOfEmployeesFinalResults");
+
+		if (mapOfEmployeeCalcDomact == null || mapOfEmployeesFinalResults == null) {
+			return;
+		}
+		java.util.Date chosenDate = (java.util.Date) httpSession.getAttribute("chosenDate");
+		Integer intYear = Integer.parseInt(chosenDate.toString().substring(0, 4));
+		String dateRange = (intYear - 1) + "-" + intYear;
+		String dirPath = "src\\main\\resources\\static\\documents\\raportsAnualPerf";
+		String fileName = "\\raportAnualPerf_" + dateRange + ".docx";
+		File dir = new File(dirPath);
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
+		FileOutputStream fileOutputStream;
+		try {
+			fileOutputStream = new FileOutputStream(new File(dirPath + fileName));
+			XWPFDocument document = generationService.generateRaportAnual(mapOfEmployeeCalcDomact,
+					mapOfEmployeesFinalResults, chosenDate);
+			document.write(fileOutputStream);
+			fileOutputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		File file = new File(dirPath + fileName);
+		response.setContentType("application/octet-stream");
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment;filename=" + file.getName();
+		response.setHeader(headerKey, headerValue);
+
+		try {
+			ServletOutputStream outputStream = response.getOutputStream();
+			BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+
+			byte[] buffer = new byte[(int) file.length()];
+			int bytesRead = -1;
+
+			while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+				outputStream.write(buffer, 0, bytesRead);
+			}
+			outputStream.close();
+			bufferedInputStream.close();
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
 	}
 
 	@GetMapping("/selectEmployeeForFiveYearsResult")
@@ -1705,5 +1768,62 @@ public class CriteriaController {
 		model.addAttribute("employee", employee);
 
 		return "/CriteriaPages/FiveYearsDomactResult";
+	}
+
+	@GetMapping("/generateLastFiveResultRaport")
+	public void generateLastFiveResultRaport(HttpSession httpSession, HttpServletResponse response) {
+		@SuppressWarnings("unchecked")
+		Map<Domact, Map<java.util.Date, List<CalculatedDomact>>> sortedMapOfLastFiveYearsCalcDom = (Map<Domact, Map<java.util.Date, List<CalculatedDomact>>>) httpSession
+				.getAttribute("sortedMapOfLastFiveYearsCalcDom");
+		@SuppressWarnings("unchecked")
+		Map<java.util.Date, String> mapOfYearsRange = (Map<java.util.Date, String>) httpSession
+				.getAttribute("mapOfYearsRange");
+		@SuppressWarnings("unchecked")
+		Map<Domact, Double> mapOfTotalPuncte = (Map<Domact, Double>) httpSession.getAttribute("mapOfTotalPuncte");
+		Employee employee = (Employee) httpSession.getAttribute("chosenEmployee");
+		if (sortedMapOfLastFiveYearsCalcDom == null || mapOfTotalPuncte == null || mapOfYearsRange == null
+				|| employee == null) {
+			return;
+		}
+		String dirPath = "src\\main\\resources\\static\\documents\\" + employee.getLogin() + "_" + employee.getName()
+				+ "" + employee.getSurname();
+		String fileName = "\\Activitatea_ultimii_5_ani_" + employee.getName() + "_" + employee.getSurname() + ".docx";
+		File dir = new File(dirPath);
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
+		FileOutputStream fileOutputStream;
+		try {
+			fileOutputStream = new FileOutputStream(new File(dirPath + fileName));
+			XWPFDocument document = generationService.generateLastFiveYearsRaport(sortedMapOfLastFiveYearsCalcDom,
+					mapOfYearsRange, mapOfTotalPuncte, employee);
+			document.write(fileOutputStream);
+			fileOutputStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		File file = new File(dirPath + fileName);
+		response.setContentType("application/octet-stream");
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment;filename=" + file.getName();
+		response.setHeader(headerKey, headerValue);
+
+		try {
+			ServletOutputStream outputStream = response.getOutputStream();
+			BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+
+			byte[] buffer = new byte[(int) file.length()];
+			int bytesRead = -1;
+
+			while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+				outputStream.write(buffer, 0, bytesRead);
+			}
+			outputStream.close();
+			bufferedInputStream.close();
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
 }
