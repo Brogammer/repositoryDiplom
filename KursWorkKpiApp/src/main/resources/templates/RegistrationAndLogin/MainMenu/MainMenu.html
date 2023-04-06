@@ -15,10 +15,6 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
 <style type="text/css">
-.opportunity {
-	
-}
-
 .UserOpportunity {
 	display: flex;
 	flex-direction: column;
@@ -28,65 +24,193 @@
 	display: flex;
 	flex-direction: column;
 }
-a{
 
+h2 {
+	color: black;
+	margin-left: 10%;
 }
-.btn-success{
+
+
+
+body {
+	
+	background-color: white;
+}
+
+.body-text {
+	padding-top: 20vh;
+	text-align: center;
+	position: relative;
+}
+
+.hamburger-icon {
+	position: absolute;
+	z-index: 1;
+	top: 5vh;
+	left: 5vw;
+	padding-bottom: 2vh;
+}
+
+.hamburger-icon span {
+	height: 5px;
+	width: 40px;
+	background-color: black;
+	display: block;
+	margin: 5px 0px 5px 0px;
+	transition: 0.7s ease-in-out;
+	transform: none;
+}
+
+#openmenu:checked ~ .menu-pane {
+	left: -5vw;
+	transform: translateX(-5vw);
+}
+
+#openmenu:checked ~ .body-text {
+	display: none;
+}
+
+#openmenu:checked ~ .hamburger-icon span:nth-of-type(2) {
+	transform: translate(0%, 175%) rotate(-45deg);
+	background-color: white;
+}
+
+#openmenu:checked ~ .hamburger-icon span:nth-of-type(3) {
+	transform: rotate(45deg);
+	background-color: white;
+}
+
+#openmenu:checked ~ .hamburger-icon span:nth-of-type(1) {
+	opacity: 0;
+}
+
+#openmenu:checked ~ .hamburger-icon span:nth-of-type(4) {
+	opacity: 0;
+}
+
+div.menu-pane {
 	background-color: gray;
+	position: absolute;
+	transform: translateX(-105vw);
+	transform-origin: (0, 0);
+	width: 100vw;
+	height: 170%;
+	transition: 0.6s ease-in-out;
+}
+
+.menu-pane p {
+	color: black;
+	font-size: 0.6em;
+}
+
+.menu-pane nav {
+	padding: 10%;
+}
+
+.menu-links li, a, span {
+	transition: 0.5s ease-in-out;
+}
+
+.menu-pane ul {
+	padding: 10%;
+	padding-top :1%;
+	display: inline-block;
+}
+
+.menu-pane li {
+	
+	padding-bottom: 20px;
+	margin-left: 10px;
+	font-size: 1em;
+}
+
+.menu-links li a {
+	color: black;
+	text-decoration: none;
+}
+
+.menu-links li:hover a {
+	color: lime;
+}
+
+
+
+.menu-links li:first-child a {
+	padding: 5px;
+}
+
+input.hamburger-checkbox {
+	position: absolute;
+	z-index: 3;
+	top: 5vh;
+	left: 5vw;
+	width: 10vw;
+	opacity: 0;
+	height: 6vh;
 }
 </style>
 </head>
 <body>
 
-	<!-- create navigation bar ( header) -->
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed"
-					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
-					aria-controls="navbar">
-					<span class="sr-only"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#" th:href="@{/}">Main menu</a>
-			</div>
+
+	<div class="menu-container">
+
+		<input type="checkbox" id="openmenu" class="hamburger-checkbox">
+
+		<div class="hamburger-icon">
+			<label for="openmenu" id="hamburger-label"> <span></span> <span></span>
+				<span></span> <span></span>
+			</label>
 		</div>
-	</nav>
 
-	<br>
-	<br>
-	<!-- Create HTML registration form -->
-	<div class="container">
-		<h1
-			th:text="${'Welcome '+ employee.getName() + ' ' + employee.getSurname() + '!'}"></h1>
+		<div class="menu-pane">
 
-		<div class="opportunity">
-			<div class="UserOpportunity" th:if="${roles.contains('ROLE_USER')}">
-				<p>Here is your User opportunities:</p>
+			<nav>
+				<h2 th:if="${roles.contains('ROLE_USER')}">Here is your User
+					opportunities:</h2>
+				<ul th:if="${roles.contains('ROLE_USER')}" class="menu-links">
+					<li><a th:href="@{/CriteriaSelectionForInsert}">Insert
+							Data for "Evaluarea Anuala"</a></li>
 
-				
-				
-				<a th:href="@{/CriteriaSelectionForInsert}" class="btn btn-success">Insert
-					Data for "Evaluarea Anuala"</a> <a th:href="@{/CriteriaResultByDate}"
-					class="btn btn-success">Generate Inserted "Evaluarea Anuala" </a> <a
-					th:href="@{/lastFiveYearsActivity}" class="btn btn-success"> Generate
-					"RAPORT DESPRE ACTIVITATEA DIDACTICO-STIINTIFICA PENTRU ULTIMI 5
-					ANI"</a> <a th:href="@{/EmployeeLogin?logout}" class="btn btn-success">Logout</a>
-			</div>
-			<div class="AdminOpportunity" th:if="${roles.contains('ROLE_ADMIN')}">
-				<p>Here is your Admin opportunities:</p>
-				<a th:href="@{/AllCriteriaResultByDate}" class="btn btn-success"> Generate
-					"RAPORT ANUAL DESPRE PERFORMANTA CADRELOR DIDACTICE"</a> <a
-					th:href="@{/PositionRegistration}" class="btn btn-success">Position
-					Registration</a> <a th:href="@{/DepartmentRegistration}"
-					class="btn btn-success">Department Registration</a> <a
-					th:href="@{/CalificationList}" class="btn btn-success">Calification
-					Registration</a> <a th:href="@{/DomactRegistration}"
-					class="btn btn-success">Domeniul de Activitate Registration</a> <a
-					th:href="@{/CriteriaRegistration}" class="btn btn-success">Criteria
-					Registration</a>
-			</div>
+					<li><a th:href="@{/CriteriaResultByDate}">Generate
+							Inserted "Evaluarea Anuala" </a></li>
+					<li><a th:href="@{/lastFiveYearsActivity}"> Generate
+							"RAPORT DESPRE ACTIVITATEA DIDACTICO-STIINTIFICA PENTRU ULTIMI 5
+							ANI"</a></li>
+					<li><a th:href="@{/EmployeeUpdation}">Change Employee Data</a></li>
+					
+					<li><a th:href="@{/EmployeeLogin?logout}">Logout</a></li>
+					
+				</ul>
+				<h2 th:if="${roles.contains('ROLE_ADMIN')}" style="color: black">Here
+					is your Administrator opportunities:</h2>
+				<ul class="menu-links" th:if="${roles.contains('ROLE_ADMIN')}">
+					<li><a th:href="@{/AllCriteriaResultByDate}"> Generate
+							"RAPORT ANUAL DESPRE PERFORMANTA CADRELOR DIDACTICE"</a></li>
+
+					<li><a th:href="@{/PositionRegistration}">Position
+							Registration</a></li>
+					<li><a th:href="@{/DepartmentRegistration}">Department
+							Registration</a></li>
+					<li><a th:href="@{/CalificationList}">Calification
+							Registration</a></li>
+					<li><a th:href="@{/DomactRegistration}">Domeniul de
+							Activitate Registration</a></li>
+					<li><a th:href="@{/CriteriaRegistration}">Criteria
+							Registration</a></li>
+				</ul>
+
+
+			</nav>
+		</div>
+		<div class="body-text">
+			<h1
+				th:text="${'Welcome '+ employee.getName() + ' ' + employee.getSurname() + '!'}">Code
+				Pen Challenge</h1>
+
 		</div>
 	</div>
+	<!-- Create HTML registration form -->
+
 </body>
 </html>

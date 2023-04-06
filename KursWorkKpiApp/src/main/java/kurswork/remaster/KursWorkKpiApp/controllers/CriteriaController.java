@@ -445,6 +445,7 @@ public class CriteriaController {
 		variableDTOs.get(id).setVariable_sign(variableDTO.getVariable_sign());
 		variableDTOs.get(id).setVariable_descr(variableDTO.getVariable_descr());
 		variableDTOs.get(id).setRestrictions(variableDTO.getRestrictions());
+		variableDTOs.get(id).setCount(variableDTO.getCount());
 
 		return "redirect:/VariableList";
 
@@ -619,7 +620,6 @@ public class CriteriaController {
 				|| searchSettingsDTO.getString().isBlank()) {
 			searchSettingsDTO.setType(5);
 		}
-
 		String[] prompts = searchSettingsDTO.getString().split(",");
 
 		switch (searchSettingsDTO.getType()) {
@@ -658,7 +658,7 @@ public class CriteriaController {
 					subgroup.setCriterias(subgroup.getCriterias().stream()
 							.filter(criteria -> Stream.of(prompts)
 									.anyMatch(prompt -> criteria.getCriteria_name().trim().toLowerCase()
-											.contains(prompt.trim().toLowerCase())))
+											.equals(prompt.trim().toLowerCase())))
 							.sorted((cr1, cr2) -> cr1.getCriteria_id() - cr2.getCriteria_id())
 							.collect(Collectors.toList()));
 
@@ -686,13 +686,17 @@ public class CriteriaController {
 				});
 
 			});
+			break;
 		default:
+			
 			domacts = employee.getPosition().getDPCs().stream().map(dpc -> dpc.getDomact()).distinct()
 					.sorted((dmct1, dmct2) -> dmct1.getDomact_id() - dmct2.getDomact_id()).collect(Collectors.toList());
 			break;
 		}
+		
 		httpSession.setAttribute("domacts", domacts);
 		httpSession.setAttribute("searchDTO", searchSettingsDTO);
+		
 
 		return "redirect:/CriteriaSelectionForInsert";
 	}

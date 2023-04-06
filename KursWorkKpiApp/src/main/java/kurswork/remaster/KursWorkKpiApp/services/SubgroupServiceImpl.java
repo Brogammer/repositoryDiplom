@@ -28,7 +28,7 @@ public class SubgroupServiceImpl implements SubgroupService{
 	@Override
 	public List<Subgroup> findAll() {
 		// TODO Auto-generated method stub
-		return subgroupRepository.findAll();
+		return subgroupRepository.findAll().stream().distinct().collect(Collectors.toList());
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class SubgroupServiceImpl implements SubgroupService{
 	@Override
 	public List<Subgroup> findAllByDomact(Domact domact) {
 		// TODO Auto-generated method stub
-		return domactService.findById(domact.getDomact_id()).getSubgroups().stream().collect(Collectors.toList());
+		return domactService.findById(domact.getDomact_id()).getSubgroups().stream().distinct().collect(Collectors.toList());
 	}
 
 }

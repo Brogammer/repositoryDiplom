@@ -58,7 +58,7 @@
 					th:object="${insertedVariableDTO}">
 					<div class="form-group">
 						<label class="control-label" for="Value"> Variable Value </label>
-						<input id="Value" class="form-control"
+						<input id="Value" class="form-control" type ="number" min="0" step = "any"
 							th:field="*{inserted_value}" required autofocus="autofocus" />
 					</div>
 					<div class="form-group">

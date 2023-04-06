@@ -19,7 +19,7 @@ public class Variable {
 	private int variable_id;
 	@Column(name = "variable_sign", nullable = false)
 	private String variable_sign;
-	@Column(name = "variable_descr", nullable = false)
+	@Column(name = "variable_descr", nullable = false,columnDefinition = "TEXT", length = 5000)
 	private String variable_descr;
 	@Column(name = "variable_restrictions", nullable = true)
 	private String restrictions;

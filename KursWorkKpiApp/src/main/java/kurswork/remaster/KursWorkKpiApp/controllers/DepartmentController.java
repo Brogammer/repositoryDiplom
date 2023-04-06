@@ -42,6 +42,31 @@ public class DepartmentController {
 		
 		return "/DepartmentsAndPositions/DepartmentSelection";
 	}
+	@GetMapping("/DepartmentSelectionForUpdation")
+	public String getDepartmentSelectionForUpdation (Model model) {
+		
+		List<Department> departments = departmentService.findAll()
+				.stream()
+				.collect(Collectors.toList());
+		model.addAttribute("departmentList", departments);
+		model.addAttribute("department", new Department());
+		model.addAttribute("PostUrl", "/DepartmentSelectionForUpdation");
+		
+		
+		
+		return "/DepartmentsAndPositions/DepartmentSelection";
+	}
+	
+	@PostMapping("/DepartmentSelectionForUpdation")
+	public String postDepartmentSelectionForUpdation (@ModelAttribute("department")Department department, Model model, HttpSession httpSession) {
+		
+		Department selectedDepartment = departmentService.findById(department.getDepartment_id());
+		httpSession.setAttribute("selectedDepartment", selectedDepartment);
+		
+		
+		
+		return "redirect:/EmployeeUpdation";
+	}
 	
 	@PostMapping("/DepartmentSelection")
 	public String postDepartmentSelection (@ModelAttribute("department")Department department, Model model, HttpSession httpSession) {

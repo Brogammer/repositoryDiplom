@@ -15,5 +15,6 @@ public interface EmployeeService extends UserDetailsService {
 	Boolean hasAlreadyLoginExisted (String login);
 	public Employee save(Employee employee);
 	public Employee findByLogin(String login);
+	public Employee update(Employee employee);
 	
 }
