@@ -92,29 +92,19 @@ public class EmployeeController {
 
 	@GetMapping("/EmployeeRegistration")
 	public String getRegistrationMenu(Model model, HttpSession httpSession) {
-
 		Department selectedDepartment = (Department) httpSession.getAttribute("selectedDepartment");
-		if (selectedDepartment == null) {
-			return "redirect:/DepartmentSelection";
-		}
-
+		if (selectedDepartment == null) {return "redirect:/DepartmentSelection";}
 		List<Position> positions = positionService.findAll();
-
 		EmployeeRegistrationDTO emptyDTO = new EmployeeRegistrationDTO();
 		emptyDTO.setPosition(new Position());
-
 		model.addAttribute("employee", emptyDTO);
-
 		httpSession.setAttribute("positionList", positions);
 		model.addAttribute("positionList", positions);
-
 		return "RegistrationAndLogin/RegistrationForm";
 	}
-
 	@PostMapping("/EmployeeRegistration")
 	public String postRegistrationData(@ModelAttribute("employee") EmployeeRegistrationDTO dto, Model model,
 			HttpSession httpSession) {
-
 		boolean isLoginIncorrect = employeeService.hasAlreadyLoginExisted(dto.getLogin());
 		@SuppressWarnings("unchecked")
 		List<Position> positions = (List<Position>) httpSession.getAttribute("positionList");
@@ -124,8 +114,8 @@ public class EmployeeController {
 			model.addAttribute("positionList", positions);
 			return "RegistrationAndLogin/RegistrationForm";
 		} else {
-			Position chosedPosition = positionService.findById(dto.getPosition().getPosition_id());
-			dto.setPosition(chosedPosition);
+			Position chosenPosition = positionService.findById(dto.getPosition().getPosition_id());
+			dto.setPosition(chosenPosition);
 			Department selectedDepartment = (Department) httpSession.getAttribute("selectedDepartment");
 			dto.setDepartment(selectedDepartment);
 			employeeService.save(dto);

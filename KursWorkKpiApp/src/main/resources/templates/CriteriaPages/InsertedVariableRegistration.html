@@ -44,7 +44,9 @@
 
 
 				<h1>Variable Value Registration</h1>
-				<h3
+				<h3 th:if = "${insertedVariableDTO.getIndex() != null}"
+					th:text="${'Name: ' + insertedVariableDTO.getVariable().getVariable_sign() + insertedVariableDTO.getIndex()}"></h3>
+				<h3 th:if = "${insertedVariableDTO.getIndex() == null}"
 					th:text="${'Name: ' + insertedVariableDTO.getVariable().getVariable_sign()}"></h3>
 				<h3
 					th:text="${'Descr: '+insertedVariableDTO.getVariable().getVariable_descr()}"></h3>

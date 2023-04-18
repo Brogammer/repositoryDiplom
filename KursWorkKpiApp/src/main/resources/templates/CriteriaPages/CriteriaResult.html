@@ -91,7 +91,7 @@
 							</tr>
 							<tr class=row>
 								<td
-									th:text="${domactResultEntry.getValue() / normaStiintificaDTO.getValue()}"></td>
+									th:text="${ Math.round((domactResultEntry.getValue() / normaStiintificaDTO.getValue())*100)/100.0}"></td>
 								<td
 									th:text="${domactCalificationResult.get(domactResultEntry.getKey()).getCalificat_symbol()}"></td>
 							</tr>

@@ -15,7 +15,7 @@ public class VariableServiceImpl implements VariableService {
 	@Override
 	public Variable save(VariableDTO dto) {
 		// TODO Auto-generated method stub
-		Variable variable = new Variable(0, dto.getVariable_sign().trim(), dto.getVariable_descr().trim(), dto.getRestrictions(), dto.getCount(), null, null);
+		Variable variable = new Variable(0, dto.getVariable_sign().trim(), dto.getVariable_descr().trim(), dto.getRestrictions(), dto.getCount().trim(), null, null);
 		return variableRepository.save(variable);
 	}
 }

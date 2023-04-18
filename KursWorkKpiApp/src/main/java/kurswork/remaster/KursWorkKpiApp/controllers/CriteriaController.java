@@ -688,15 +688,14 @@ public class CriteriaController {
 			});
 			break;
 		default:
-			
+
 			domacts = employee.getPosition().getDPCs().stream().map(dpc -> dpc.getDomact()).distinct()
 					.sorted((dmct1, dmct2) -> dmct1.getDomact_id() - dmct2.getDomact_id()).collect(Collectors.toList());
 			break;
 		}
-		
+
 		httpSession.setAttribute("domacts", domacts);
 		httpSession.setAttribute("searchDTO", searchSettingsDTO);
-		
 
 		return "redirect:/CriteriaSelectionForInsert";
 	}
@@ -1060,7 +1059,7 @@ public class CriteriaController {
 //					list.forEach(elem -> System.out.println("\t\t" + elem.getInserted_value()));
 //				}
 //			});
-			formulaService.evaluateFormula(entry.getKey(), entry.getValue());
+//			formulaService.evaluateFormula(entry.getKey(), entry.getValue());
 		});
 		List<Domact> insertedDomacts = mapOfFormulaVars.entrySet().stream().map(entry -> entry.getKey())
 				.flatMap(formul -> formul.getCriteriaFormulas().stream()
@@ -1083,10 +1082,11 @@ public class CriteriaController {
 							.map(crForm -> crForm.getCriteria().getSubgroup().getDomact()).distinct()
 							.allMatch(domact -> domact.getDomact_id() == insDomact.getDomact_id()))
 					.forEach(entry -> {
-						mapOfCriteriaResults.get(insDomact)
-								.put(entry.getKey().getCriteriaFormulas().stream().map(crForm -> crForm.getCriteria())
+						mapOfCriteriaResults.get(insDomact).put(
+								entry.getKey().getCriteriaFormulas().stream().map(crForm -> crForm.getCriteria())
 										.findAny().orElse(null),
-										formulaService.evaluateFormula(entry.getKey(), entry.getValue()));
+								Math.round(formulaService.evaluateFormula(entry.getKey(), entry.getValue()) * 100)
+										/ 100.0);
 					});
 		});
 		Map<Domact, Double> mapOfDomactResults = new TreeMap<>((k1, k2) -> k1.getDomact_id() - k2.getDomact_id());
@@ -1167,7 +1167,8 @@ public class CriteriaController {
 
 		model.addAttribute("domactCalificationResult", domactCalificationResult);
 		model.addAttribute("employee", employee);
-		model.addAttribute("finalResult", finalResult);
+		model.addAttribute("finalResult", Math.round(finalResult * 100) / 100.0);
+		model.addAttribute("Math", Math.class);
 
 		return "/CriteriaPages/CriteriaResult";
 	}
@@ -1209,7 +1210,7 @@ public class CriteriaController {
 
 		domactCalificationResult.entrySet().forEach(entry -> {
 			calculatedDomactService.save(new CalculatedDomactDTO(calcDTOForDate.getDomactCalcDate(),
-					mapOfDomactResults.get(entry.getKey()) / normaStiintificaDTO.getValue(),
+					Math.round((mapOfDomactResults.get(entry.getKey()) / normaStiintificaDTO.getValue()) * 100) / 100.0,
 					entry.getValue().getCalificat_symbol(), employee, entry.getKey(), normaStiintificaDTO.getValue()));
 		});
 
@@ -1329,8 +1330,10 @@ public class CriteriaController {
 					entry.getKey().getCriteriaFormulas().stream().map(crForm -> crForm.getCriteria()).findAny()
 							.orElse(null),
 					entry.getValue().stream().flatMap(list -> list.stream()).collect(Collectors.toList()));
-			mapOfCriteriaResults.put(entry.getKey().getCriteriaFormulas().stream().map(crForm -> crForm.getCriteria())
-					.findAny().orElse(null), formulaService.evaluateFormula(entry.getKey(), entry.getValue()));
+			mapOfCriteriaResults.put(
+					entry.getKey().getCriteriaFormulas().stream().map(crForm -> crForm.getCriteria()).findAny()
+							.orElse(null),
+					Math.round((formulaService.evaluateFormula(entry.getKey(), entry.getValue())) * 100.0) / 100.0);
 
 		});
 
@@ -1440,7 +1443,7 @@ public class CriteriaController {
 		Double finalResult = domactCalificationResult.entrySet().stream()
 				.map(entry -> entry.getValue().getCalificat_coef()).reduce(0.0, (d1, d2) -> d1 + d2)
 				/ domactCalificationResult.size();
-		httpSession.setAttribute("finalResult", finalResult);
+		httpSession.setAttribute("finalResult", Math.round(finalResult * 100) / 100.0);
 		model.addAttribute("domactCalificationResult", domactCalificationResult);
 		model.addAttribute("normaStiintificaDTO", normaStiintificaDTO);
 		model.addAttribute("mapOfDomactSubgroups", mapOfDomactSubgroups);
@@ -1449,7 +1452,7 @@ public class CriteriaController {
 		model.addAttribute("mapOfCriteriaResults", mapOfCriteriaResults);
 		model.addAttribute("employee", employee);
 		model.addAttribute("mapOfDomactResults", mapOfDomactResult);
-		model.addAttribute("finalResult", finalResult);
+		model.addAttribute("finalResult", Math.round(finalResult * 100) / 100.0);
 
 		return "/CriteriaPages/CriteriaResultForFileGeneration";
 	}
@@ -1604,7 +1607,11 @@ public class CriteriaController {
 					/ entry.getValue().size());
 
 		});
+		mapOfEmployeesFinalResults.entrySet().forEach(entry -> {
+			mapOfEmployeesFinalResults.put(entry.getKey(),
+					Math.round(mapOfEmployeesFinalResults.get(entry.getKey()) * 100.0) / 100.0);
 
+		});
 		model.addAttribute("mapOfEmployeesFinalResults", mapOfEmployeesFinalResults);
 		model.addAttribute("mapOfEmployeeCalcDomact", mapOfEmployeeCalcDomact);
 		httpSession.setAttribute("mapOfEmployeesFinalResults", mapOfEmployeesFinalResults);
