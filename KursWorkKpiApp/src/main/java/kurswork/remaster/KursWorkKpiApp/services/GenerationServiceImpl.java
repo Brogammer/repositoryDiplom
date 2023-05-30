@@ -49,7 +49,7 @@ public class GenerationServiceImpl implements GenerationService {
 		CalculatedDomact randomCalcDom = mapOfCalculatedDomacts.entrySet().stream().findAny().get().getValue();
 		document1.createParagraph().createRun()
 				.setText("Angajat pe: " + randomCalcDom.getNormaStiintifica() + " norma didactica");
-		mapOfDomactSubgroups.entrySet().forEach(entry -> {
+		mapOfCalculatedDomacts.entrySet().forEach(entry -> {
 			// Создается заголовок
 			document1.createParagraph().createRun().setText(entry.getKey().getDomact_name());
 			// Создается таблица с заголовком
@@ -75,38 +75,39 @@ public class GenerationServiceImpl implements GenerationService {
 					run.setBold(true);
 				}
 			}
+			if (mapOfDomactSubgroups.get(entry.getKey()) != null)
+				for (Subgroup subgroup : mapOfDomactSubgroups.get(entry.getKey())) {
+					XWPFTableRow subgroupRow = table.createRow();
 
-			for (Subgroup subgroup : entry.getValue()) {
-				XWPFTableRow subgroupRow = table.createRow();
+					// Поле subgroup_name
+					XWPFTableCell subgroupCell = subgroupRow.getTableCells().get(1);
 
-				// Поле subgroup_name
-				XWPFTableCell subgroupCell = subgroupRow.getTableCells().get(1);
+					XWPFRun subgroupRun = subgroupCell.addParagraph().createRun();
+					subgroupRun.setText("Criteriul " + subgroup.getSubgroup_name());
+					subgroupRun.setBold(true);
 
-				XWPFRun subgroupRun = subgroupCell.addParagraph().createRun();
-				subgroupRun.setText("Criteriul " + subgroup.getSubgroup_name());
-				subgroupRun.setBold(true);
-
-				// Добавляются строки для критериев
-				for (Criteria criteria : mapOfSubGroupCriteria.get(subgroup)) {
-					XWPFTableRow criteriaRow = table.createRow();
-					criteriaRow.getTableCells().get(0).addParagraph().createRun().setText(criteria.getCriteria_name());
-					criteriaRow.getTableCells().get(1).addParagraph().createRun()
-							.setText(criteria.getCriteria_descr() + " ");
-					mapOfCriteriaVars.get(criteria).stream().forEach(insVar -> {
+					// Добавляются строки для критериев
+					for (Criteria criteria : mapOfSubGroupCriteria.get(subgroup)) {
+						XWPFTableRow criteriaRow = table.createRow();
+						criteriaRow.getTableCells().get(0).addParagraph().createRun()
+								.setText(criteria.getCriteria_name());
 						criteriaRow.getTableCells().get(1).addParagraph().createRun()
-								.setText(insVar.getVariable().getVariable_descr() + " ("
-										+ insVar.getVariable().getVariable_sign() + "):");
-						criteriaRow.getTableCells().get(1).addParagraph().createRun()
-								.setText("\tInserted Value :" + insVar.getInserted_value());
-						criteriaRow.getTableCells().get(1).addParagraph().createRun()
-								.setText("Comment :" + insVar.getComment());
+								.setText(criteria.getCriteria_descr() + " ");
+						mapOfCriteriaVars.get(criteria).stream().forEach(insVar -> {
+							criteriaRow.getTableCells().get(1).addParagraph().createRun()
+									.setText(insVar.getVariable().getVariable_descr() + " ("
+											+ insVar.getVariable().getVariable_sign() + "):");
+							criteriaRow.getTableCells().get(1).addParagraph().createRun()
+									.setText("\tInserted Value :" + insVar.getInserted_value());
+							criteriaRow.getTableCells().get(1).addParagraph().createRun()
+									.setText("Comment :" + insVar.getComment());
 
-					});
-					criteriaRow.getTableCells().get(2).addParagraph().createRun()
-							.setText(Double.toString(mapOfCriteriaResults.get(criteria)));
-					criteriaRow.getTableCells().get(3).addParagraph().createRun().setText("");
+						});
+						criteriaRow.getTableCells().get(2).addParagraph().createRun()
+								.setText(Double.toString(mapOfCriteriaResults.get(criteria)));
+						criteriaRow.getTableCells().get(3).addParagraph().createRun().setText("");
+					}
 				}
-			}
 			// System.out.println(entry.getKey().getDomact_name() );
 
 			CalculatedDomact calculatedDomact = mapOfCalculatedDomacts.entrySet().stream()

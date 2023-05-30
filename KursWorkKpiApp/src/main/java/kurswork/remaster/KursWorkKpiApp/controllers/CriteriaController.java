@@ -1269,8 +1269,8 @@ public class CriteriaController {
 
 		List<java.util.Date> dates = calculatedDomactService.findAll().stream()
 				.filter(calcDom -> calcDom.getEmployee().getEmployee_id() == chosenEmployee.getEmployee_id())
-				.map(calcDom -> calcDom.getDomactCalcDate()).distinct().collect(Collectors.toList());
-
+				.map(calcDom -> calcDom.getDomactCalcDate()).distinct().sorted().collect(Collectors.toList());
+		
 		CalculatedDomact emptyCalcDomForDate = (CalculatedDomact) httpSession.getAttribute("emptyCalcDomForDate");
 
 		model.addAttribute("dates", dates);

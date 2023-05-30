@@ -37,6 +37,7 @@ public class DepartmentController {
 		model.addAttribute("departmentList", departments);
 		model.addAttribute("department", new Department());
 		model.addAttribute("PostUrl", "/DepartmentSelection");
+		model.addAttribute("navBarUrl","/EmployeeLogin");
 		
 		
 		
@@ -51,6 +52,7 @@ public class DepartmentController {
 		model.addAttribute("departmentList", departments);
 		model.addAttribute("department", new Department());
 		model.addAttribute("PostUrl", "/DepartmentSelectionForUpdation");
+		model.addAttribute("navBarUrl","/");
 		
 		
 		
