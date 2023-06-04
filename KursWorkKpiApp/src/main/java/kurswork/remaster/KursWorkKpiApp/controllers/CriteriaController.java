@@ -1194,6 +1194,7 @@ public class CriteriaController {
 
 		CalculatedDomactDTO calcDTOForDate = (CalculatedDomactDTO) httpSession
 				.getAttribute("calculatedDomactDTOForDate");
+		
 
 		if (calcDTOForDate == null) {
 			return "redirect:/insertDate";
@@ -1383,7 +1384,7 @@ public class CriteriaController {
 		NormaStiintificaDTO normaStiintificaDTO = new NormaStiintificaDTO(0);
 		calculatedDomacts.stream()
 				.filter(calcDom -> calcDom.getDomactCalcDate().getYear() == chosenDate.getYear()
-						&& calcDom.getDomactCalcDate().getDay() == chosenDate.getDay()
+						&& calcDom.getDomactCalcDate().getDate() == chosenDate.getDate()
 						&& calcDom.getDomactCalcDate().getMonth() == chosenDate.getMonth())
 				.forEach(calcDom -> {
 					if (normaStiintificaDTO.getValue() == 0)

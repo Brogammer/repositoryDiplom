@@ -46,7 +46,7 @@ public class CalculatedDomactServiceImpl implements CalculatedDomactService {
 						&& calcDom.getEmployee().getEmployee_id() == employee.getEmployee_id()
 						&& calcDom.getDomactCalcDate().getYear() == date.getYear()
 						&& calcDom.getDomactCalcDate().getMonth() == date.getMonth()
-						&& calcDom.getDomactCalcDate().getDay() == date.getDay())
+						&& calcDom.getDomactCalcDate().getDate() == date.getDate())
 				.findAny().orElse(null);
 
 		return calculatedDomact;
